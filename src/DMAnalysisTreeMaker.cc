@@ -1915,10 +1915,11 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
     int nTightAntiIsoLeptons = 0;
     for(size_t mc =0; mc < obj_cats[mu_label].size();++mc){
       string cat= obj_cats[mu_label].at(mc);
-      if(cat.find("_Iso04_")!=std::string::npos && cat.find("GE")!=std::string::npos){
-	nTightAntiIsoLeptons+=sizes[cat];
+      if(cat.find("_Iso04_")!=std::string::npos && cat.find("GE")!=std::string::npos && cat.find("Tight")!=std::string::npos){
+	//	cout<< " cat " << 
+	nTightAntiIsoLeptons+=sizes[mu_label+cat];
       }
-    }
+    } 
     //float_values["Event_nTightAntiIsoMuons"]+float_values["Event_nTightAntiIsoElectrons"];
     
     for(size_t l =0; l< leptons.size();++l){

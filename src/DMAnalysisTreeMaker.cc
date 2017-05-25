@@ -1749,8 +1749,7 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
       
       //if(isTight>0 && pt> 24 && abs(eta) < 2.4 /*&& iso <0.15 Isolation added afterwards*/){//UCL Selection
       if(isTight>0 && pt> 26 && fabs(eta) < 2.4 /*&& iso <0.15 Isolation added afterwards*/){//NA Selection
- 	
-
+	
 	if(iso<0.06){// 2015 Selection
 	  ++float_values["Event_nTightMuons"];
 	  TLorentzVector muon;
@@ -1813,6 +1812,7 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
       float isVeto = vfloats_values[makeName(ele_label,pref,"isVeto")][el];
       
       isTight = vfloats_values[makeName(ele_label,pref,"vidTight")][el];
+      float isTightnoiso = vfloats_values[makeName(ele_label,pref,"vidTightnoiso")][el];
       isLoose = vfloats_values[makeName(ele_label,pref,"vidLoose")][el];
       isMedium = vfloats_values[makeName(ele_label,pref,"vidMedium")][el];
       isVeto = vfloats_values[makeName(ele_label,pref,"vidVeto")][el];
@@ -1834,13 +1834,15 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
       if(fabs(scEta)<=1.479){
 	//passesTightCuts = ( isTight >0.0 /*&& iso < 0.0588 */) && (fabs(eldz) < 0.10) && (fabs(eldxy) <0.05 ) ;
 	passesTightCuts = (isTight >0.0) && (fabs(eldz) < 0.10) && (fabs(eldxy) <0.05 ) && (fabs(scEta)<1.4442 || fabs(scEta)>1.5660);
-	passesTightAntiIsoCuts = isTight >0.0 && iso > 0.0588 ;
-
+	//passesTightAntiIsoCuts = iso > 0.0588 ;
+	passesTightAntiIsoCuts = isTightnoiso && iso > 0.2 ;
       } //is barrel electron
       //if( ( fabs(scEta)>1.479 && fabs(scEta)<2.5 ) && ( (fabs(eldz) < 0.20) && (fabs(eldxy) < 0.10) ) ){
       if( ( fabs(scEta)>1.479 && fabs(scEta)<2.5 ) && ( (fabs(eldz) < 0.20) && (fabs(eldxy) < 0.10) ) && (fabs(scEta)<1.4442 || fabs(scEta)>1.5660) ){
-	passesTightCuts = isTight >0.0 /*&& iso < 0.0571*/ ;
-	passesTightAntiIsoCuts = isTight >0.0 && iso > 0.0571 ;
+	//passesTightCuts = isTight >0.0 /*&& iso < 0.0571*/ ;
+	//passesTightAntiIsoCuts = isTight >0.0 && iso > 0.0571 ;
+	//passesTightAntiIsoCuts = iso > 0.0571 ;
+	passesTightAntiIsoCuts = isTightnoiso && iso > 0.2 ;
       }
 
       if(pt> 30 && fabs(eta) < 2.1 && ((fabs(scEta)<1.4442 || fabs(scEta)>1.5660))){
@@ -2600,11 +2602,22 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
     //Preselection part
 
     //    cout << " before preselection "<<endl;
-		       
+    float nJetsForCut=nTightJets;
+    for(size_t mc =0; mc < obj_cats[jets_label].size();++mc){
+      string cat= obj_cats[jets_label].at(mc);
+      if (isSysCat(jets_label,cat) && ! isScanCut(jets_label,cat)){
+	//	cout << " cat "<< cat  << " is systcat, nTightJets "<< nTightJets << " size "<< sizes[jets_label+cat] << endl; 
+	nJetsForCut=min(nTightJets,(float)sizes[jets_label+cat]);
+	//	cout << " njetsforcut "<<nJetsForCut<<endl;
+      }
+    }
+  
+  
     if(doPreselection){
       bool passes = true;
       //bool metCondition = (metptCorr >100.0);
-      passes = passes && nTightJets>=1.0;
+      //      passes = passes && nTightJets>=1.0;
+      passes = passes && nJetsForCut>=2.0;
       //      passes = passes && nTightLeptons>=1.0;
       passes = passes && (nTightLeptons>=1.0 || nTightAntiIsoLeptons>=1.0);
      

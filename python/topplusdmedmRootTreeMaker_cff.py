@@ -334,6 +334,7 @@ DMTreesDumper.physicsObjects.append(
             cms.InputTag("electrons","elhasMatchedConVeto"),
             cms.InputTag("electrons","elvidVeto"),
             cms.InputTag("electrons","elvidTight"),
+            cms.InputTag("electrons","elvidTightnoiso"),
             cms.InputTag("electrons","elvidMedium"),
             cms.InputTag("electrons","elDz"),
             cms.InputTag("electrons","elDxy"),
@@ -347,7 +348,7 @@ DMTreesDumper.physicsObjects.append(
         categories = cms.vstring(catEl),
         systCats = cms.vstring(sysEl),
 #        categories = cms.vstring("Tight","Veto"),
-        toSave = cms.vstring("elE","elPt","elEta","elPhi","elIso03","elisTight","elCharge","elisMedium","elisLoose","elisVeto","elSCEta","allExtra","elDz","elDxy"),
+        toSave = cms.vstring("elE","elPt","elEta","elPhi","elIso03","elisTight","elvidTightnoiso","elCharge","elisMedium","elisLoose","elisVeto","elSCEta","allExtra","elDz","elDxy"),
         )
     ) 
 

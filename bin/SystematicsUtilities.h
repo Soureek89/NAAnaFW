@@ -46,7 +46,7 @@ struct systWeights{
   void addSystNonPDF(string name);
   void setWCats(double *wcats);
   void setSelectionsNames(string * selections);
-
+  
   //Selections
   void addSelection(string name);
 
@@ -65,6 +65,7 @@ struct systWeights{
 
   bool onlyNominal;
   bool addPDF, addQ2, addTopPt, addVHF, addTTSplit,addJER,addJES;
+  bool shortPDFFiles;
   int maxSysts, maxSystsNonPDF;
   int nPDF;
   int nCategories;
@@ -122,7 +123,7 @@ void systWeights::closeFilesSysts(TFile *filesout[(int)MAXSYSTS]){
       filesout[(int)sy+(MAX+1)*(c)]->Close();
     }
     
-    if(this->addPDF){
+    if(this->addPDF && !this->shortPDFFiles){
       if(!useOnlyNominal){
 	filesout[MAX+(MAX+1)*(c)]->Close();
       }
@@ -191,6 +192,7 @@ void systWeights::initTreesSysts(TTree ** trees, TFile * file){
 
 void systWeights::initTreeSysts(TTree * tree, bool isEventBasedSyst){
   int MAX = this->maxSysts;
+  if(this->shortPDFFiles) MAX= this->maxSystsNonPDF;
   for(int sy=0;sy<(int)MAX;++sy){
     if(isEventBasedSyst&&sy>0)continue;
     TString ns= (this->weightedNames[sy]).c_str();
@@ -335,7 +337,7 @@ void systWeights::writeHistogramsSysts(TH1F** histo, TFile **filesout){
     for(int sy=0;sy<(int)MAX;++sy){
       //cout << "c is now "<< c << " sy "<< sy << " location "<< sy+(MAXTOT+1)*c <<" is histo there? " << histo[sy+(MAXTOT+1)*c] << " file location "<<sy+(MAX+1)*c << " is file there "<< filesout[sy+(MAX+1)*c]<< endl;
       
-      //cout << " writing histo "<< histo[sy+(MAXTOT+1)*c]->GetName()<< " in file "<< filesout[sy+(MAX+1)*c]->GetName()<<endl;;
+      //      cout << " writing histo "<< histo[sy+(MAXTOT+1)*c]->GetName()<< " in file "<< filesout[sy+(MAX+1)*c]->GetName()<<endl;;
       
       //      TString ns= weightedSystsNames((weightedSysts)sy);
       if(!(!useOnlyNominal || sy==0)) continue;
@@ -351,7 +353,8 @@ void systWeights::writeHistogramsSysts(TH1F** histo, TFile **filesout){
       //histo[sy]=new TH1F(name+ns,name+ns,nbins,min,max);
     }
     
-    if(this->addPDF){
+    //    cout << " histo pdf now "<<endl;
+    if(this->addPDF && !this->shortPDFFiles){
       if(!useOnlyNominal){
         filesout[MAX+(MAX+1)*(c)]->cd();
         //cout << " file max is "<< filesout[MAX+(MAX+1)*c]->GetName()<<endl;
@@ -366,6 +369,7 @@ void systWeights::writeHistogramsSysts(TH1F** histo, TFile **filesout){
       }
     }
   }
+  //  cout << " end writing histo "<<endl;
 }
 
 void systWeights::createFilesSysts(  TFile ** allFiles, TString basename, TString opt){
@@ -398,7 +402,7 @@ void systWeights::createFilesSysts(  TFile ** allFiles, TString basename, TStrin
         }
       
       if(this->addPDF){
-      if(!useOnlyNominal)allFiles[MAX+((MAX+1)*c)]= TFile::Open((basename+"_pdf"+cname+".root"), opt);
+      if(!useOnlyNominal && !this->shortPDFFiles)allFiles[MAX+((MAX+1)*c)]= TFile::Open((basename+"_pdf"+cname+".root"), opt);
       //cout << " created file at c "<< c << " s "<< MAX+(MAX+1)*c << " location "<< MAX+(MAX+1)*c<<endl;
       //      cout<< " fname "<<allFiles[MAX+(MAXTOT+1)*c]->GetName()<<endl;
         }
@@ -551,6 +555,7 @@ void systWeights::copySysts(systWeights sys, bool copySelections){
   this->addTTSplit=sys.addTTSplit;
   this->setWCats(sys.wCats);
   if(copySelections)this->setSelectionsNames(sys.selectionsNames);
+  this->shortPDFFiles=true;
 
 }
 
@@ -563,6 +568,7 @@ void systWeights::setMaxNonPDF(int max){
 
 void systWeights::prepareDefault(bool addDefault, bool addQ2, bool addPDF, bool addTopPt, bool addJES, bool addJER, bool addVHF, bool addTTSplit, int numPDF){ 
   this->addPDF=addPDF;
+  this->shortPDFFiles=true;
   this->addQ2=addQ2;
   this->addJES=addJES;
   this->addJER=addJER;
@@ -702,7 +708,7 @@ void systWeights::writeSingleHistogramSysts(TH1F* histo, TFile **filesout){
       histo->Write();
       //    histo[sy]=new TH1F(name+ns,name+ns,nbins,min,max);
     }
-    if(this->addPDF){
+    if(this->addPDF && !this->shortPDFFiles){
       if(!useOnlyNominal){
         filesout[MAX+(MAX+1)*c]->cd();
         int MAXPDF=this->maxSysts;
@@ -734,15 +740,23 @@ void systWeights::setEventBasedDefault(){
 void systWeights::setPDFWeights(float * wpdfs, int numPDFs, float wzero,bool mult){
   float zerofact=1.0;
   if(mult)zerofact=this->weightedSysts[0];
+  float rms=0,mean=0;
   for (int i = 0; i < numPDFs; ++i){
     this->setPDFValue(i,zerofact*wpdfs[i]/wzero);
+    mean += wpdfs[i]/wzero;
   }
+  mean = mean/numPDFs;
+  for (int i = 0; i < numPDFs; ++i){
+    rms += (wpdfs[i]/wzero-mean)*(wpdfs[i]/wzero-mean);
+    
+  }  
+  rms= sqrt(rms/numPDFs);
   this->setSystValue("pdf_asUp", this->getPDFValue(this->nPDF-2)/wzero);
   this->setSystValue("pdf_asDown", zerofact);
   this->setSystValue("pdf_zmUp", this->getPDFValue(this->nPDF-1)/wzero);
   this->setSystValue("pdf_zmDown", zerofact);
-  this->setSystValue("pdf_totalUp", zerofact);
-  this->setSystValue("pdf_totalDown", zerofact);
+  this->setSystValue("pdf_totalUp", zerofact*(1+rms));
+  this->setSystValue("pdf_totalDown", zerofact*(1-rms));
 }
 
 //void systWeights::setTWeight(float tweight, float totalweight){

@@ -1896,7 +1896,7 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
 
       if(isVeto>0 && pt> 15 && fabs(eta) < 2.5 && ((fabs(scEta)<1.4442 || fabs(scEta)>1.5660))){
 	  
-      //if((fabs(scEta)<=1.479 && (iso<0.175)) || ((fabs(scEta)>1.479 && fabs(scEta)<2.5) && (iso<0.159))){
+	//if((fabs(scEta)<=1.479 && (iso<0.175)) || ((fabs(scEta)>1.479 && fabs(scEta)<2.5) && (iso<0.159))){
 	
 	if((fabs(scEta)<=1.479 && (fabs(eldz) < 0.10) && (fabs(eldxy) <0.05 )) || ((fabs(scEta)>1.479 && fabs(scEta)<2.5) && (fabs(eldz) < 0.20) && (fabs(eldxy) < 0.10) )){
 	  ++float_values["Event_nVetoElectrons"]; 
@@ -1909,7 +1909,24 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
 	sizes[ele_label+"Veto"]=(int)float_values["Event_nVetoElectrons"];
       }
       vfloats_values[ele_label+"_PassesDRmu"][el]=(float)passesDRmu;
+      
+      if(isVeto<1 && pt> 35 && fabs(eta) < 2.5 && ((fabs(scEta)<1.4442 || fabs(scEta)>1.5660))){
+	
+	//if((fabs(scEta)<=1.479 && (iso<0.175)) || ((fabs(scEta)>1.479 && fabs(scEta)<2.5) && (iso<0.159))){
+	
+	if((fabs(scEta)<=1.479 && (fabs(eldz) < 0.10) && (fabs(eldxy) <0.05 )) || ((fabs(scEta)>1.479 && fabs(scEta)<2.5) && (fabs(eldz) < 0.20) && (fabs(eldxy) < 0.10) )){
+	  ++float_values["Event_nAntivetoElectrons"]; 
+	  if(isInVector(obj_cats[ele_label],"Antiveto")){
+	    fillCategory(ele_label,"Antiveto",el,float_values["Event_nAntivetoElectrons"]-1);
+	  }
+	}
+      }
+      if(isInVector(obj_cats[ele_label],"Antiveto")){
+	sizes[ele_label+"Antiveto"]=(int)float_values["Event_nAntivetoElectrons"];
+      }
+
     } 
+
     int firstidx=-1, secondidx=-1;
     double maxpt=0.0;
     
@@ -1922,6 +1939,12 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
 	nTightAntiIsoLeptons+=sizes[mu_label+cat];
       }
     } 
+    for(size_t ec =0; ec < obj_cats[ele_label].size();++ec){
+      string cat= obj_cats[ele_label].at(ec);
+      if(cat.find("TightAnti")!=std::string::npos || cat.find("Antiveto")!=std::string::npos ){
+	nTightAntiIsoLeptons += sizes[ele_label+cat];
+      }
+    }
     //float_values["Event_nTightAntiIsoMuons"]+float_values["Event_nTightAntiIsoElectrons"];
     
     for(size_t l =0; l< leptons.size();++l){
@@ -2544,6 +2567,8 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
       metT1Px+=corrMetT1Px; metT1Py+=corrMetT1Py; // add JEC/JER contribution
     }
     float metptT1Corr = sqrt(metT1Px*metT1Px + metT1Py*metT1Py);
+    vfloats_values[met_label+"_CorrT1Px"][0]=metT1Px;
+    vfloats_values[met_label+"_CorrT1Py"][0]=metT1Py;
     vfloats_values[met_label+"_CorrT1Pt"][0]=metptT1Corr;
     
     for (size_t ju = 0; ju < obj_systCats[jets_label].size();++ju){
@@ -3183,6 +3208,7 @@ vector<string> DMAnalysisTreeMaker::additionalVariables(string object){
     addvar.push_back("nLooseMuons");
     addvar.push_back("nTightElectrons");
     addvar.push_back("nTightAntiIsoElectrons");
+    addvar.push_back("nAntivetoElectrons");
     addvar.push_back("nMediumElectrons");
     addvar.push_back("nLooseElectrons");
     addvar.push_back("nVetoElectrons");
@@ -3715,33 +3741,28 @@ void DMAnalysisTreeMaker::setEventBTagSF(string label, string category, string a
     float eta = vfloats_values[lc+"_Eta"][j];
     //    int flavor = vfloats_values[lc+"_PartonFlavour"][j];
     int flavor = vfloats_values[lc+"_HadronFlavour"][j];
-    
-    //    cout <<"jet "<< j<< " istagged l "<<vfloats_values[lc+"_IsCSVL"][j]<< " flavor "<< flavor<<endl;
-    
+
     double csvteff = MCTagEfficiency(algo+"T",flavor, ptCorr,eta);
-    double sfcsvt = TagScaleFactor(algo+"T", flavor, "noSyst", ptCorr,eta);
     
     double csvleff = MCTagEfficiency(algo+"L",flavor,ptCorr,eta);
-    double sfcsvl = TagScaleFactor(algo+"L", flavor, "noSyst", ptCorr,eta);
-    
+
     double csvmeff = MCTagEfficiency(algo+"M",flavor,ptCorr,eta);
-    double sfcsvm = TagScaleFactor(algo+"M", flavor, "noSyst", ptCorr,eta);
+
     
+    //    cout <<"jet "<< j<< " istagged l "<<vfloats_values[lc+"_IsCSVL"][j]<< " flavor "<< flavor<<endl;
     if(doTopDecayReshaping){
-      //double leadingLeptonCharge=+1;//leadingleptonCharge;
       double pFlavour=vfloats_values[lc+"_PartonFlavour"][j];
       double product=topCharge*pFlavour;
       if(fabs(pFlavour)==5){
-	//	cout << "jet j"<< j<< " pflav "<< pFlavour <<" sf bef "<<sfcsvt <<endl;
-	if(fabs(pFlavour)==5 && product >0){
-	  sfcsvt = sfcsvt*MCTagEfficiency(algo+"T",1,ptCorr,eta)/csvteff;
-	  sfcsvm = sfcsvm*MCTagEfficiency(algo+"M",1,ptCorr,eta)/csvmeff;
-	  sfcsvl = sfcsvl*MCTagEfficiency(algo+"L",1,ptCorr,eta)/csvleff;
-	}
-	//	cout << "jet j"<< j<< " pflav "<< pFlavour <<" sf aft "<<sfcsvt <<endl;
+	flavor = 1;
       }
     }
     
+    double sfcsvt = TagScaleFactor(algo+"T", flavor, "noSyst", ptCorr,eta);
+    
+    double sfcsvl = TagScaleFactor(algo+"L", flavor, "noSyst", ptCorr,eta);
+    double sfcsvm = TagScaleFactor(algo+"M", flavor, "noSyst", ptCorr,eta);
+   
     double sfcsvt_mistag_up = TagScaleFactor(algo+"T", flavor, "mistag_up", ptCorr,eta);
     double sfcsvl_mistag_up = TagScaleFactor(algo+"L", flavor, "mistag_up", ptCorr,eta);
     double sfcsvm_mistag_up = TagScaleFactor(algo+"M", flavor, "mistag_up", ptCorr,eta);
@@ -3757,6 +3778,42 @@ void DMAnalysisTreeMaker::setEventBTagSF(string label, string category, string a
     double sfcsvt_b_tag_up = TagScaleFactor(algo+"T", flavor, "b_tag_up", ptCorr,eta);
     double sfcsvl_b_tag_up = TagScaleFactor(algo+"L", flavor, "b_tag_up", ptCorr,eta);
     double sfcsvm_b_tag_up = TagScaleFactor(algo+"M", flavor, "b_tag_up", ptCorr,eta);
+    
+    if(doTopDecayReshaping){
+      //double leadingLeptonCharge=+1;//leadingleptonCharge;
+      double pFlavour=vfloats_values[lc+"_PartonFlavour"][j];
+      double product=topCharge*pFlavour;
+      if(fabs(pFlavour)==5){
+	//	cout << "jet j"<< j<< " pflav "<< pFlavour <<" sf bef "<<sfcsvt <<endl;
+	if(fabs(pFlavour)==5 && product >0){
+	  sfcsvt = sfcsvt*MCTagEfficiency(algo+"T",1,ptCorr,eta)/csvteff;
+	  sfcsvm = sfcsvm*MCTagEfficiency(algo+"M",1,ptCorr,eta)/csvmeff;
+	  sfcsvl = sfcsvl*MCTagEfficiency(algo+"L",1,ptCorr,eta)/csvleff;
+
+
+	  sfcsvt_mistag_up = sfcsvt_mistag_up*MCTagEfficiency(algo+"T",1, ptCorr,eta)/csvteff;
+	  sfcsvl_mistag_up = sfcsvl_mistag_up*MCTagEfficiency(algo+"L",1, ptCorr,eta)/csvleff;
+	  sfcsvm_mistag_up = sfcsvm_mistag_up*MCTagEfficiency(algo+"M",1, ptCorr,eta)/csvmeff;
+	  
+	  sfcsvt_mistag_down = sfcsvt_mistag_down*MCTagEfficiency(algo+"T",1, ptCorr,eta)/csvteff;
+	  sfcsvl_mistag_down = sfcsvl_mistag_down*MCTagEfficiency(algo+"L",1, ptCorr,eta)/csvleff;
+	  sfcsvm_mistag_down = sfcsvm_mistag_down*MCTagEfficiency(algo+"M",1, ptCorr,eta)/csvmeff;
+	  
+	  sfcsvt_b_tag_down = sfcsvt_b_tag_down*MCTagEfficiency(algo+"T",1, ptCorr,eta)/csvteff;
+	  sfcsvl_b_tag_down = sfcsvl_b_tag_down*MCTagEfficiency(algo+"L",1, ptCorr,eta)/csvleff;
+	  sfcsvm_b_tag_down = sfcsvm_b_tag_down*MCTagEfficiency(algo+"M",1, ptCorr,eta)/csvmeff;
+	  
+	  sfcsvt_b_tag_up = sfcsvt_b_tag_up*MCTagEfficiency(algo+"T",1, ptCorr,eta)/csvteff;
+	  sfcsvl_b_tag_up = sfcsvl_b_tag_up*MCTagEfficiency(algo+"L",1, ptCorr,eta)/csvleff;
+	  sfcsvm_b_tag_up = sfcsvm_b_tag_up*MCTagEfficiency(algo+"M",1, ptCorr,eta)/csvmeff;
+	  
+	  
+	}
+	//	cout << "jet j"<< j<< " pflav "<< pFlavour <<" sf aft "<<sfcsvt <<endl;
+      }
+    }
+    
+
     
     
     jsfscsvt.push_back(BTagWeight::JetInfo(csvteff, sfcsvt));

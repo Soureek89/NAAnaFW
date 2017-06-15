@@ -322,7 +322,7 @@ int main(int argc, char **argv) {
     if(doSynch) addJES = false;
     if(isData=="DATA") addJES=false;
     bool addPDF=false,addQ2=false,addTopPt=false,addVHF=false,addTTSplit=false;
-    //addQ2=true;addPDF=true;
+    addQ2=true;addPDF=true;
     //addJES=false;
     if(sample=="TT"){
         addTTSplit=false;
@@ -821,6 +821,8 @@ int main(int argc, char **argv) {
     float * costhetapolSecond_3j2t = new float(-999.0);
     float * costhetaelSecond_3j2t = new float(-999.0); 
     
+    float * met_3j2t = new float(-999.0); 
+
     
     //3j1t selection
     float * w_3j1t = new float(-999.0);
@@ -861,6 +863,10 @@ int main(int argc, char **argv) {
      float * leadingextrajetcsv_3j1t = new float(-999.0);
      float * leadingextrajetcsvweight_3j1t = new float(-999.0);
      float * leadingextrajetcsvweight_sd_3j1t = new float(-999.0);
+
+     float * met_3j1t = new float(-999.0); 
+     float * nextrajets_3j1t = new float(-999.0); 
+
      
     syst0BM.copySysts(systZero);
     syst1BM.copySysts(systZero);
@@ -926,7 +932,9 @@ int main(int argc, char **argv) {
       
       syst1BM.branchTreesSysts(trees1T,"3j1t","mtw", outTreeFile, mtw_3j1t);
       syst1BM.branchTreesSysts(trees1T,"3j1t","mt2w", outTreeFile, mt2w_3j1t);
+      syst1BM.branchTreesSysts(trees1T,"3j1t","MET", outTreeFile, met_3j1t);
       
+
       syst1BM.branchTreesSysts(trees1T,"3j1t","etajprime", outTreeFile, etajprime_3j1t);
       syst1BM.branchTreesSysts(trees1T,"3j1t","jprimeflavour", outTreeFile, jprimeflavour_3j1t);
       
@@ -954,6 +962,7 @@ int main(int argc, char **argv) {
       syst1BM.branchTreesSysts(trees1T,"3j1t","costhetaelExtra", outTreeFile, costhetaelExtra_3j1t);
       syst1BM.branchTreesSysts(trees1T,"3j1t","costhetapolExtra", outTreeFile, costhetapolExtra_3j1t);
       
+      syst1BM.branchTreesSysts(trees1T,"3j1t","nextrajets", outTreeFile, nextrajets_3j1t);
       syst1BM.branchTreesSysts(trees1T,"3j1t","leadingextrajetcsv", outTreeFile, leadingextrajetcsv_3j1t);
       syst1BM.branchTreesSysts(trees1T,"3j1t","leadingextrajetpt", outTreeFile, leadingextrajetpt_3j1t);
       syst1BM.branchTreesSysts(trees1T,"3j1t","leadingextrajeteta", outTreeFile, leadingextrajeteta_3j1t);
@@ -969,7 +978,8 @@ int main(int argc, char **argv) {
       syst2BM.branchTreesSysts(trees2T,"3j2t","topMassLeading", outTreeFile, topMassLeading_3j2t);
       syst2BM.branchTreesSysts(trees2T,"3j2t","topMassSecond", outTreeFile, topMassSecond_3j2t);
       syst2BM.branchTreesSysts(trees2T,"3j2t","mt2w", outTreeFile, mt2w_3j2t);
-
+      syst2BM.branchTreesSysts(trees2T,"3j2t","MET", outTreeFile, met_3j2t);
+      
 
        syst2BM.branchTreesSysts(trees2T,"3j2t","deltaEtabb", outTreeFile, deltaEtabb_3j2t);
  
@@ -990,6 +1000,8 @@ int main(int argc, char **argv) {
        syst2BM.branchTreesSysts(trees2T,"3j2t","topEtaSecond", outTreeFile, topEtaSecond_3j2t);
        syst2BM.branchTreesSysts(trees2T,"3j2t","costhetaelSecond", outTreeFile, costhetaelSecond_3j2t);
        syst2BM.branchTreesSysts(trees2T,"3j2t","costhetapolSecond", outTreeFile, costhetapolSecond_3j2t);
+
+       syst2BM.branchTreesSysts(trees2T,"3j2t","nextrajets", outTreeFile, nextrajets_3j2t);
 
     }
 
@@ -1988,9 +2000,9 @@ int main(int argc, char **argv) {
       if(tops.size()!=0){
 	double mass = tops.at(0).M();
 	double pt = tops.at(0).Pt();
-	cout << "scenario "<<scenario<<endl;
-	cout << "evt bjet0 pt "<< bjets[0].Pt()<< " bjet0 eta "<< bjets[0].Eta()<<" bjet0 phi<< "<< bjets[0].Phi()<< " e "<< bjets[0].E()<<endl;
-	cout << " metpx "<<metpx << " metpy "<<metpy<<endl;
+	//cout << "scenario "<<scenario<<endl;
+	//cout << "evt bjet0 pt "<< bjets[0].Pt()<< " bjet0 eta "<< bjets[0].Eta()<<" bjet0 phi<< "<< bjets[0].Phi()<< " e "<< bjets[0].E()<<endl;
+	//cout << " metpx "<<metpx << " metpy "<<metpy<<endl;
 	*topMass_2j1t=mass;
 	*topY_2j1t=tops.at(0).Y();
 	*topPt_2j1t=pt;
@@ -2222,6 +2234,7 @@ int main(int argc, char **argv) {
           float phi_lmet = fabs(deltaPhi(tightLep[i].Phi(), metPhi[0]) );
           mt = sqrt(2* tightLep[i].Pt() * met* ( 1- cos(phi_lmet)));
 	  *mtw_3j1t=mt;
+	  *met_3j1t = met;
 	  syst1BM.fillHistogramsSysts(h_3j1t_mtw,mt,w);
 	  syst1BM.fillHistogramsSysts(h_3j1t_met,met,w);
 	  if(channel=="muon" || channel == "muonantiiso")syst1BM.fillHistogramsSysts(h_3j1t_muIso,selectedIso[i],w);
@@ -2309,8 +2322,8 @@ int main(int argc, char **argv) {
       *topYExtra_3j1t=tops.at(1).Y();
       *costhetapolExtra_3j1t = topUtils.costhetapol(tightLep.at(0), jetprime_3j1t, tops.at(1));
       *costhetaelExtra_3j1t = topUtils.costhetael(tops.at(1), tightLep.at(0), metpx, metpy);
-      
-      
+      *nextrajets_3j1t=	extrajets.size();
+
       if(addTrees)syst1BM.fillTreesSysts(trees1T,"3j1t");
       //AOB for 3j1t?
     }    
@@ -2358,6 +2371,7 @@ int main(int argc, char **argv) {
 	    syst2BM.fillHistogramsSysts(h_3j2t_mtw,mt,w);
 	    syst2BM.fillHistogramsSysts(h_3j2t_met,met,w);
 	    *mtw_3j2t=mt;
+	    *met_3j2t = met;
 	    if(channel=="muon" || channel == "muonantiiso")syst2BM.fillHistogramsSysts(h_3j2t_muIso,selectedIso[i],w);
 	    if(mt>50){
 	      syst2BM.fillHistogramsSysts(h_3j2t_mtwcut_MuPt,tightLep[i].Pt(),w);
@@ -2411,7 +2425,7 @@ int main(int argc, char **argv) {
       TVector2 met( metpx, metpy);
       double Mt2w = Mt2cal->calculateMT2w(jets_nob20,bjets20,tightLep.at(0), met,"MT2w"); 
      *mt2w_3j2t = Mt2w;
-      
+     *nextrajets_3j2t= extrajets.size();
       *w_3j2t=w;
       if(addTrees)syst2BM.fillTreesSysts(trees2T,"3j2t");
       //AOB for 3j2t?
@@ -2487,7 +2501,6 @@ int main(int argc, char **argv) {
 
   systZero.rescaleHistograms(h_2j1t_mtwcut_sr_leadingextrajetcsv_sd_b,h_2j1t_mtwcut_sr_leadingextrajetcsv_reshape_sd_b);
   systZero.addHistograms(h_2j1t_mtwcut_sr_leadingextrajetcsv,h_2j1t_mtwcut_sr_leadingextrajetcsv_sd_b);
-
 
   //Write the Histogramms here  
   systZero.writeSingleHistogramSysts(h_cutFlow, allMyFiles); 
@@ -2673,11 +2686,14 @@ int main(int argc, char **argv) {
   systZero.writeHistogramsSysts(h_nJets, allMyFiles); 
   systZero.writeHistogramsSysts(h_nbJets, allMyFiles);
   
+  //  cout << "bef trees "<<endl;
   if(addTrees){
+
     syst1BM.writeTreesSysts(trees1T,outTreeFile);
     syst2BM.writeTreesSysts(trees2T,outTreeFile);
   }
   
+  //  cout << "after trees "<<endl;
   systZero.closeFilesSysts(allMyFiles);
   
   std::cout<< "Info: Total No. of events for sample["<<sample<<"] : "<<nEvents<<std::endl;

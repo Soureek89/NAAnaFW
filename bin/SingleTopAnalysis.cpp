@@ -320,21 +320,22 @@ int main(int argc, char **argv) {
     
     // addJES=false for sync exe
     if(doSynch) addJES = false;
-    if(isData=="DATA") addJES=false;
     bool addPDF=false,addQ2=false,addTopPt=false,addVHF=false,addTTSplit=false;
     addQ2=true;addPDF=true;
+    if(isData=="DATA") {addJES=false,addQ2=false,addPDF=false;}
     //addJES=false;
     if(sample=="TT"){
         addTTSplit=false;
         }
 
     if(sample.find("_sd")!=std::string::npos){
-        doTtoSDDecay=true;
-        }
+      doTtoSDDecay=true;
+    }
 
+    systZero.setData(isData=="DATA");//isData overrides all the following options.
     systZero.prepareDefault(true, addQ2, addPDF, addTopPt,addJES,addJER,addVHF,addTTSplit);
     //Here must add all systematics we want to put there so that the size of the syst vector is set
-
+    
     //this maxSysts is to set the number of systematics we do want IMPORTANT FOR ALL INITIALIZATIONS
     maxSysts= systZero.maxSysts;
     TFile * allMyFiles[maxSysts];
@@ -387,12 +388,20 @@ int main(int argc, char **argv) {
     chain.SetBranchAddress("electronsTight_size", &elSize);
     chain.SetBranchAddress("electronsVeto_size", &elLooseSize);
 
-    chain.SetBranchAddress("electronsTightAntiIso_Iso03", elAntiIsoIso);
-    chain.SetBranchAddress("electronsTightAntiIso_size", &elAntiIsoSize);
-    chain.SetBranchAddress("electronsTightAntiIso_E",     elAntiIsoE);
-    chain.SetBranchAddress("electronsTightAntiIso_Phi",   elAntiIsoPhi);
-    chain.SetBranchAddress("electronsTightAntiIso_Eta",   elAntiIsoEta);
-    chain.SetBranchAddress("electronsTightAntiIso_Pt",    elAntiIsoPt);
+    //    chain.SetBranchAddress("electronsTightAntiIso_Iso03", elAntiIsoIso);
+    //    chain.SetBranchAddress("electronsTightAntiIso_size", &elAntiIsoSize);
+    //    chain.SetBranchAddress("electronsTightAntiIso_E",     elAntiIsoE);
+    //    chain.SetBranchAddress("electronsTightAntiIso_Phi",   elAntiIsoPhi);
+    //    chain.SetBranchAddress("electronsTightAntiIso_Eta",   elAntiIsoEta);
+    //    chain.SetBranchAddress("electronsTightAntiIso_Pt",    elAntiIsoPt);
+
+
+    chain.SetBranchAddress("electronsAntiveto_Iso03", elAntiIsoIso);
+    chain.SetBranchAddress("electronsAntiveto_size", &elAntiIsoSize);
+    chain.SetBranchAddress("electronsAntiveto_E",     elAntiIsoE);
+    chain.SetBranchAddress("electronsAntiveto_Phi",   elAntiIsoPhi);
+    chain.SetBranchAddress("electronsAntiveto_Eta",   elAntiIsoEta);
+    chain.SetBranchAddress("electronsAntiveto_Pt",    elAntiIsoPt);
     
     chain.SetBranchAddress("muonsTight_E", muE);
     chain.SetBranchAddress("muonsTight_Phi", muPhi);
@@ -630,7 +639,6 @@ int main(int argc, char **argv) {
     
 
     if(isData!="DATA"){
-      
       
      
       chain.SetBranchAddress(("Event_bWeight2"+btagalgo+"Tight").c_str(), &bWeight2CSVM);

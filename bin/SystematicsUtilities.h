@@ -63,9 +63,12 @@ struct systWeights{
   void setScenario(string scenario);
   void setEventBasedDefault();
 
+  void setData(bool isData);
+
   bool onlyNominal;
   bool addPDF, addQ2, addTopPt, addVHF, addTTSplit,addJER,addJES;
   bool shortPDFFiles;
+  bool isData;
   int maxSysts, maxSystsNonPDF;
   int nPDF;
   int nCategories;
@@ -555,7 +558,7 @@ void systWeights::copySysts(systWeights sys, bool copySelections){
   this->addTTSplit=sys.addTTSplit;
   this->setWCats(sys.wCats);
   if(copySelections)this->setSelectionsNames(sys.selectionsNames);
-  this->shortPDFFiles=true;
+  this->shortPDFFiles=sys.shortPDFFiles;
 
 }
 
@@ -565,8 +568,26 @@ void systWeights::setMax(int max){
 void systWeights::setMaxNonPDF(int max){
   this->maxSystsNonPDF =  max;
   }
-
+void systWeights::setData(bool isData){
+  this->isData=isData;
+  if(this->isData==true){
+    this->addQ2=false; this->addPDF=false;
+    this->addJES=false; this->addVHF=false; this->addJER=false;
+    this->addTTSplit=false;
+    this->nPDF=0;
+    this->nCategories=1;
+  }
+}
 void systWeights::prepareDefault(bool addDefault, bool addQ2, bool addPDF, bool addTopPt, bool addJES, bool addJER, bool addVHF, bool addTTSplit, int numPDF){ 
+  if(this->isData==true){
+    addDefault=false;  addQ2=false; addPDF=false;
+    addJES=false; addVHF=false; addJER=false;
+    addTTSplit=false;
+    numPDF=0;
+    this->weightedNames[0]="";
+    this->setMax(1);
+    this->setMaxNonPDF(1);
+  }
   this->addPDF=addPDF;
   this->shortPDFFiles=true;
   this->addQ2=addQ2;
@@ -652,16 +673,19 @@ void systWeights::prepareDefault(bool addDefault, bool addQ2, bool addPDF, bool 
     this->wCats[2]=1.0;
     this->wCats[3]=1.0;
     }
-
   if(addPDF){
     this->weightedNames[this->maxSysts]= "pdf_totalUp";
     this->weightedNames[this->maxSysts+1]= "pdf_totalDown";
-    this->weightedNames[this->maxSysts+2]= "pdf_asUp";
-    this->weightedNames[this->maxSysts+3]= "pdf_asDown";
-    this->weightedNames[this->maxSysts+4]= "pdf_zmUp";
-    this->weightedNames[this->maxSysts+5]= "pdf_zmDown";
-    this->setMax(this->maxSysts+6);
-    this->setMaxNonPDF(this->maxSystsNonPDF+6);
+    this->setMax(this->maxSysts+2);
+    this->setMaxNonPDF(this->maxSystsNonPDF+2);
+    if(!this->shortPDFFiles){
+      this->weightedNames[this->maxSysts]= "pdf_asUp";
+      this->weightedNames[this->maxSysts+1]= "pdf_asDown";
+      this->weightedNames[this->maxSysts+2]= "pdf_zmUp";
+      this->weightedNames[this->maxSysts+3]= "pdf_zmDown";
+      this->setMax(this->maxSysts+4);
+      this->setMaxNonPDF(this->maxSystsNonPDF+4);
+    }
     int nPDF=this->nPDF;
     for(int i =0; i < nPDF;++i){
       stringstream ss;
@@ -671,7 +695,6 @@ void systWeights::prepareDefault(bool addDefault, bool addQ2, bool addPDF, bool 
     this->setMax(maxSysts+nPDF);
     this->weightedNames[this->maxSysts]= "";
     }
-
   this->setEventBasedDefault();
 }
 
@@ -748,13 +771,14 @@ void systWeights::setPDFWeights(float * wpdfs, int numPDFs, float wzero,bool mul
   mean = mean/numPDFs;
   for (int i = 0; i < numPDFs; ++i){
     rms += (wpdfs[i]/wzero-mean)*(wpdfs[i]/wzero-mean);
-    
   }  
   rms= sqrt(rms/numPDFs);
-  this->setSystValue("pdf_asUp", this->getPDFValue(this->nPDF-2)/wzero);
-  this->setSystValue("pdf_asDown", zerofact);
-  this->setSystValue("pdf_zmUp", this->getPDFValue(this->nPDF-1)/wzero);
-  this->setSystValue("pdf_zmDown", zerofact);
+  if(!this->shortPDFFiles){
+    this->setSystValue("pdf_asUp", this->getPDFValue(this->nPDF-2)/wzero);
+    this->setSystValue("pdf_asDown", zerofact);
+    this->setSystValue("pdf_zmUp", this->getPDFValue(this->nPDF-1)/wzero);
+    this->setSystValue("pdf_zmDown", zerofact);
+  }
   this->setSystValue("pdf_totalUp", zerofact*(1+rms));
   this->setSystValue("pdf_totalDown", zerofact*(1-rms));
 }

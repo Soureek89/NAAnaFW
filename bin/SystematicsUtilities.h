@@ -32,8 +32,8 @@ struct systWeights{
   float getSystValue(string name);
   float getSystValue(int systPlace);
 
-  void setPDFWeights(float * wpdfs, int numPDFs, float wzero=1.0,bool mult=true);
-  void setQ2Weights(float q2up, float q2down, float wzero=1.0,bool mult=true);
+  void setPDFWeights(float * wpdfs, int numPDFs, float wzero=1.0, float* sigma_pdfs=NULL,bool mult=true);
+  void setQ2Weights(float q2up, float q2down, float wzero=1.0,float sigma_q2up=1.0, float sigma_q2down=1.0,bool mult=true);
   void setTWeight(float tweight, float wtotsample=1.0,bool mult=true);
   void setVHFWeight(int vhf,bool mult=true, double shiftval=0.65);
   void setPDFValue(int numPDF, double value);
@@ -760,17 +760,22 @@ void systWeights::setEventBasedDefault(){
 }
 
 
-void systWeights::setPDFWeights(float * wpdfs, int numPDFs, float wzero,bool mult){
+void systWeights::setPDFWeights(float * wpdfs, int numPDFs, float wzero, float * sigma_pdfs,bool mult){
   float zerofact=1.0;
   if(mult)zerofact=this->weightedSysts[0];
   float rms=0,mean=0;
   for (int i = 0; i < numPDFs; ++i){
     this->setPDFValue(i,zerofact*wpdfs[i]/wzero);
-    mean += wpdfs[i]/wzero;
+    float sratio=1.0;
+    if(sigma_pdfs!=NULL)if(sigma_pdfs[i]!=0){sratio=sigma_pdfs[i];}
+    //if(i==10)cout << " pdf " << i << " is "<< sratio<<endl;
+    mean += wpdfs[i]/(wzero*sratio);
   }
   mean = mean/numPDFs;
   for (int i = 0; i < numPDFs; ++i){
-    rms += (wpdfs[i]/wzero-mean)*(wpdfs[i]/wzero-mean);
+    float sratio=1.0;
+    if(sigma_pdfs!=NULL)if(sigma_pdfs[i]!=0){sratio=sigma_pdfs[i];}
+    rms += (wpdfs[i]/(wzero*sratio)-mean)*(wpdfs[i]/(wzero*sratio)-mean);
   }  
   rms= sqrt(rms/numPDFs);
   if(!this->shortPDFFiles){
@@ -779,8 +784,15 @@ void systWeights::setPDFWeights(float * wpdfs, int numPDFs, float wzero,bool mul
     this->setSystValue("pdf_zmUp", this->getPDFValue(this->nPDF-1)/wzero);
     this->setSystValue("pdf_zmDown", zerofact);
   }
+  if(wzero==0){
+    this->setSystValue("pdf_totalUp", wzero);
+    this->setSystValue("pdf_totalDown", wzero);
+  
+    }
+  else{
   this->setSystValue("pdf_totalUp", zerofact*(1+rms));
   this->setSystValue("pdf_totalDown", zerofact*(1-rms));
+  }
 }
 
 //void systWeights::setTWeight(float tweight, float totalweight){
@@ -803,7 +815,7 @@ void systWeights::setVHFWeight(int vhf,bool mult,double shiftval){
   this->setSystValue("VHFWeightDown", zerofact*(1-w_shift));
 }
 
-void systWeights::setQ2Weights(float q2up, float q2down, float wzero, bool mult){
+void systWeights::setQ2Weights(float q2up, float q2down, float wzero, float sigma_q2up, float sigma_q2down,bool mult){
   float zerofact=1.0;
   if(mult){
     zerofact=this->weightedSysts[0];
@@ -811,8 +823,19 @@ void systWeights::setQ2Weights(float q2up, float q2down, float wzero, bool mult)
   }
   //  cout <<  "zerofact "<< zerofact << " q2up weight "<< q2up/wzero << " tot to fill "<< zerofact*q2up/wzero<<endl;
   //  cout <<  "zerofact "<< zerofact << " q2down weight "<< q2down/wzero << " tot to fill "<< zerofact*q2down/wzero<<endl;
-  this->setSystValue("q2Up", zerofact*q2up/wzero);
-  this->setSystValue("q2Down", zerofact*q2down/wzero);
+  if(wzero==0){
+   this->setSystValue("q2Up", wzero);
+   this->setSystValue("q2Down", wzero);
+   
+  }
+  else{   
+    float sigmatmp=1.0;
+    if(sigma_q2up!=0)sigmatmp=sigma_q2up;
+    this->setSystValue("q2Up", zerofact*q2up/(wzero*sigmatmp));
+    sigmatmp=1.0;    
+    if(sigma_q2down!=0)sigmatmp=sigma_q2down;
+    this->setSystValue("q2Down", zerofact*q2down/(wzero*sigmatmp));
+  }
 }
 
 double systWeights::getPDFValue(int numPDF){

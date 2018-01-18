@@ -1,0 +1,12 @@
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/Julsy/13July/SingleMuon//80xV2_SingleMuonRun2016H-03Feb2017_ver3-v1_B2GAnaFW_80X_V3p1/170714_104917/0000/treesTTJets_11.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/Julsy/13July/SingleMuon//80xV2_SingleMuonRun2016H-03Feb2017_ver3-v1_B2GAnaFW_80X_V3p1/170714_104917/0000/treesTTJets_9.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/Julsy/13July/SingleMuon//80xV2_SingleMuonRun2016H-03Feb2017_ver3-v1_B2GAnaFW_80X_V3p1/170714_104917/0000/treesTTJets_1.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/Julsy/13July/SingleMuon//80xV2_SingleMuonRun2016H-03Feb2017_ver3-v1_B2GAnaFW_80X_V3p1/170714_104917/0000/treesTTJets_7.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/Julsy/13July/SingleMuon//80xV2_SingleMuonRun2016H-03Feb2017_ver3-v1_B2GAnaFW_80X_V3p1/170714_104917/0000/treesTTJets_10.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/Julsy/13July/SingleMuon//80xV2_SingleMuonRun2016H-03Feb2017_ver3-v1_B2GAnaFW_80X_V3p1/170714_104917/0000/treesTTJets_3.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/Julsy/13July/SingleMuon//80xV2_SingleMuonRun2016H-03Feb2017_ver3-v1_B2GAnaFW_80X_V3p1/170714_104917/0000/treesTTJets_2.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/Julsy/13July/SingleMuon//80xV2_SingleMuonRun2016H-03Feb2017_ver3-v1_B2GAnaFW_80X_V3p1/170714_104917/0000/treesTTJets_5.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/Julsy/13July/SingleMuon//80xV2_SingleMuonRun2016H-03Feb2017_ver3-v1_B2GAnaFW_80X_V3p1/170714_104917/0000/treesTTJets_4.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/Julsy/13July/SingleMuon//80xV2_SingleMuonRun2016H-03Feb2017_ver3-v1_B2GAnaFW_80X_V3p1/170714_104917/0000/treesTTJets_6.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/Julsy/13July/SingleMuon//80xV2_SingleMuonRun2016H-03Feb2017_ver3-v1_B2GAnaFW_80X_V3p1/170714_104917/0000/treesTTJets_8.root
+

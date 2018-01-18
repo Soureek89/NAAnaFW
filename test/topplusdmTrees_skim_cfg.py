@@ -257,13 +257,14 @@ if not options.isData:
 
 
 if not options.isData:
-      process.DMTreesDumper.JECVersion=cms.string("Spring16_23Sep2016V2")
+      process.DMTreesDumper.JECVersion=cms.string("Summer16_23Sep2016V4")
+#      process.DMTreesDumper.JECVersion=cms.string("Spring16_23Sep2016V2")
 
 if options.isData:
-    process.DMTreesDumper.JECVersion=cms.string("Spring16_23Sep2016BCDV2")
-    if options.channel == "DATA2016EF": process.DMTreesDumper.JECVersion=cms.string("Spring16_23Sep2016EFV2")
-    if options.channel == "DATA2016G": process.DMTreesDumper.JECVersion=cms.string("Spring16_23Sep2016GV2")
-    if options.channel == "DATA2016H": process.DMTreesDumper.JECVersion=cms.string("Spring16_23Sep2016HV2")
+    process.DMTreesDumper.JECVersion=cms.string("Summer16_23Sep2016BCDV4")
+    if options.channel == "DATA2016EF": process.DMTreesDumper.JECVersion=cms.string("Summer16_23Sep2016EFV4")
+    if options.channel == "DATA2016G": process.DMTreesDumper.JECVersion=cms.string("Summer16_23Sep2016GV4")
+    if options.channel == "DATA2016H": process.DMTreesDumper.JECVersion=cms.string("Summer16_23Sep2016HV4")
 
 if options.channel == "ttbar" or options.channel == "ttbar_sd":
     process.DMTreesDumper.getPartonTop  = cms.untracked.bool(True)
@@ -272,6 +273,12 @@ if options.channel == "ttbar" or options.channel == "ttbar_sd":
 if options.channel == "ttbar_sd" or options.channel== "tch_sd":
     process.DMTreesDumper.channelInfo.getPartonTop  = cms.untracked.bool(True)
     process.DMTreesDumper.channelInfo.doTopDecayReshaping = cms.untracked.bool(True)
+    process.DMTreesDumper.channelInfo.resBFile = cms.untracked.string("testErrors.root")
+
+if  options.channel== "tch_psd":
+    process.DMTreesDumper.channelInfo.getPartonTop  = cms.untracked.bool(True)
+    process.DMTreesDumper.channelInfo.doTopDecayReshaping = cms.untracked.bool(True)
+    process.DMTreesDumper.channelInfo.isProd = cms.untracked.bool(True)
     
 if options.channel == "wzjets":
     print "channel is " + options.channel 

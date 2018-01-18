@@ -1,0 +1,6 @@
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/80xV2_ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/170714_110417/0000/treesTTJets_5.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/80xV2_ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/170714_110417/0000/treesTTJets_2.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/80xV2_ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/170714_110417/0000/treesTTJets_4.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/80xV2_ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/170714_110417/0000/treesTTJets_3.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/80xV2_ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/170714_110417/0000/treesTTJets_1.root
+

@@ -255,6 +255,8 @@ for sample in samplesAndPaths:
         print outputListJES
 
     if not opt.dryrun:
-        printFilesInList(outputListJES, "/pnfs/lcg.cscs.ch/cms/trivcat/", sample,outDir,"w",format=Format, verbose=opt.verbose>1)
-        printFilesInList(outputListJES, "/pnfs/lcg.cscs.ch/cms/trivcat/", sample,outDir,"a",format=Format, verbose=opt.verbose>1)
+#        printFilesInList(outputListJES, "/pnfs/lcg.cscs.ch/cms/trivcat/", sample,outDir,"w",format=Format, verbose=opt.verbose>1)
+#        printFilesInList(outputListJES, "/pnfs/lcg.cscs.ch/cms/trivcat/", sample,outDir,"a",format=Format, verbose=opt.verbose>1)
+        printFilesInList(outputListJES, "/cms/", sample,outDir,"w",format=Format, verbose=opt.verbose>1)
+        printFilesInList(outputListJES, "/cms/", sample,outDir,"a",format=Format, verbose=opt.verbose>1)
     

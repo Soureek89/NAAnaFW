@@ -1,0 +1,1 @@
+samplesAndPaths = {'ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1':'/cms/store/user/oiorio/SingleTop/2017/Aug/27Aug/','ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1':'/cms/store/user/oiorio/SingleTop/2017/Aug/27Aug/',}

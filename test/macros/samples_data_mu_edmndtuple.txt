@@ -1,0 +1,5 @@
+/SingleMuon/oiorio-crab_SingleMuon_Run2016B-PromptReco-v2-4bec528f6b87ab951af66249eef1642d/USER
+/SingleMuon/oiorio-crab_SingleMuon_Run2016C-PromptReco-v2-4bec528f6b87ab951af66249eef1642d/USER
+/SingleMuon/oiorio-crab_SingleMuon_Run2016D-PromptReco-v2-4bec528f6b87ab951af66249eef1642d/USER
+/SingleMuon/oiorio-crab_SingleMuon_Run2016E-PromptReco-v2-4bec528f6b87ab951af66249eef1642d/USER
+/SingleMuon/oiorio-crab_SingleMuon_Run2016G-PromptReco-v1-4bec528f6b87ab951af66249eef1642d/USER

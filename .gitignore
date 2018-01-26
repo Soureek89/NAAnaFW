@@ -53,3 +53,5 @@ python/__init__.py
 *.png
 *.pdf
 .__afs*
+
+bin/Plot/*

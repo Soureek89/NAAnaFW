@@ -336,6 +336,11 @@ edm::Handle<std::vector<std::vector<int>>> muKeys;
   float nPV;
   edm::Handle<int> ntrpu;
 
+  //CKM LHE level variables discrimination: Vts or Vtd in production
+  bool sd_prod;
+  float ckmtype;
+
+
   //JEC info
   bool changeJECs,doT1MET, doResol;
   bool isData, applyRes;
@@ -367,7 +372,7 @@ edm::Handle<std::vector<std::vector<int>>> muKeys;
   Weights *cmvaeffbt,*cmvaeffbm,*cmvaeffbl;
   Weights *cmvaeffct,*cmvaeffcm,*cmvaeffcl;
   Weights *cmvaeffot,*cmvaeffom,*cmvaeffol;
-
+  
   class BTagWeight
   {
   private:
@@ -532,6 +537,8 @@ DMAnalysisTreeMaker::DMAnalysisTreeMaker(const edm::ParameterSet& iConfig){
   getPartonTop = channelInfo.getUntrackedParameter<bool>("getPartonTop",false);
   doWReweighting = channelInfo.getUntrackedParameter<bool>("doWReweighting",false);
   doTopReweighting = channelInfo.getUntrackedParameter<bool>("doTopReweighting",false);
+  //ckm type evaluation
+  sd_prod = channelInfo.getUntrackedParameter<bool>("getCKMType",false);
 
   getWZFlavour = channelInfo.getUntrackedParameter<bool>("getWZFlavour",false);
 
@@ -622,6 +629,8 @@ DMAnalysisTreeMaker::DMAnalysisTreeMaker(const edm::ParameterSet& iConfig){
 
   isData = iConfig.getUntrackedParameter<bool>("isData",false);
   applyRes = iConfig.getUntrackedParameter<bool>("applyRes",false);
+
+
   
   t_Rho_ = consumes<double>( edm::InputTag( "fixedGridRhoFastjetAll" ) ) ;
   
@@ -1166,6 +1175,8 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
   //  useLHE=false;
   //  useLHEWeights=false;
 
+  ckmtype = 0;
+  
   if(useLHEWeights){
       getEventLHEWeights();
     }
@@ -1204,7 +1215,6 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
     size_t nup=lhes->hepeup().NUP;
 
     //    cout << " I  ID MOTHER1 MOTHER2 MASS"<<endl;
-  
     for( size_t i=0;i<nup;++i){
       //      cout << " particle number " << i << endl;
       int id = lhes->hepeup().IDUP[i];
@@ -1215,7 +1225,56 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
       float mass = lhes->hepeup().PUP[i][4];
       float moth1 = lhes->hepeup().MOTHUP[i].first;
       float moth2 = lhes->hepeup().MOTHUP[i].second;
+      float col1 = lhes->hepeup().ICOLUP[i].first;
+      float col2 = lhes->hepeup().ICOLUP[i].second;
       //      float mass = lhes->hepeup().PUP[i][4];
+      if(i<5)  cout << "id " << "m1 " << "m2 " << "c1 " << "c2 " << endl; 
+      if(i<5)  cout << id <<" "<< moth1 <<"  "<< moth2 <<"  "<< col1 <<" "<< col2 << endl; 
+      if(sd_prod && abs(id)==6){ // 
+	for( size_t j=0;j<5;++j){
+	  int id2 = lhes->hepeup().IDUP[j];
+	  float moth3 = lhes->hepeup().MOTHUP[j].first;
+	  float moth4 = lhes->hepeup().MOTHUP[j].second;
+	  float col3 = lhes->hepeup().ICOLUP[j].first;
+	  float col4 = lhes->hepeup().ICOLUP[j].second;
+	  if(col1==col3 && col2==col4 && moth3==0 && moth4==0){
+	    //	    cout << "id " << "c1 " << "c2 " << endl; 
+	    //	    cout << id2 <<" "<< col3 <<" "<< col4 << endl; 
+	    if(abs(id2)==1) ckmtype = 1;     
+	    if(abs(id2)==3) ckmtype = 2;
+	    //	    cout << "ckmtype = " << ckmtype << endl;
+	  }
+	  if(ckmtype>0)continue;
+	  if( col1 != 0 && (col1==col3||col1==col4) && id2==21){
+	    for( size_t k=0;k<5;++k){
+	      int id3 = lhes->hepeup().IDUP[k];
+	      float moth5 = lhes->hepeup().MOTHUP[k].first;
+	      float moth6 = lhes->hepeup().MOTHUP[k].second;
+	      float col5 = lhes->hepeup().ICOLUP[k].first;
+	      float col6 = lhes->hepeup().ICOLUP[k].second;
+	      if(col5==col3 || col5 == col4 || col6==col3 || col6 == col4){
+		if(abs(id3)==1) ckmtype = 1;     
+		if(abs(id3)==3) ckmtype = 2;
+	      }
+	    }
+	  }
+	  if(ckmtype>0)continue;
+	  if( col2 != 0 && (col2==col3||col2==col4) && id2==21){
+	    for( size_t k=0;k<5;++k){
+	      int id3 = lhes->hepeup().IDUP[k];
+	      float moth5 = lhes->hepeup().MOTHUP[k].first;
+	      float moth6 = lhes->hepeup().MOTHUP[k].second;
+	      float col5 = lhes->hepeup().ICOLUP[k].first;
+	      float col6 = lhes->hepeup().ICOLUP[k].second;
+	      if(col5==col3 || col5 == col4 || col6==col3 || col6 == col4){
+		if(abs(id3)==1) ckmtype = 1;     
+		if(abs(id3)==3) ckmtype = 2;
+	      }
+	    }
+	  }
+	  if(ckmtype>0)continue;
+	}
+      }
       
       //      cout << " "<< i+1 <<" " <<id << " "<< moth1 << " "<< moth2<< " " <<mass<<endl;
     
@@ -1419,6 +1478,8 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
       }
       if(   float_values["Event_W_QCD_Weight"] ==1 &&parw.size()>0 )    float_values["Event_W_QCD_Weight"]= getWPtWeight(parw.at(0).Pt());
     }
+    cout << "ckmtype = " << ckmtype << endl;
+
     //    cout << " after loop "<<endl;
     //    float_values["Event_W_EW_Weight"]=1.0;//*float_values["Event_W_QCD_Weight"];
     //    float_values["Event_Z_EW_Weight"]=1.0;//*float_values["Event_W_QCD_Weight"];
@@ -1478,8 +1539,8 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
     //      cout<< "ntpv is "<< nTruePV<<endl;
     float_values["Event_nTruePV"]=(float)(nTruePV);
   }
+  float_values["Event_CKMType"]=(float)(ckmtype);    //is_prod   
 
-      
   trees["WeightHistory"]->Fill();
   
   //Part 3: filling the additional variables
@@ -3322,7 +3383,7 @@ vector<string> DMAnalysisTreeMaker::additionalVariables(string object){
     addvar.push_back("nGoodPV");
     addvar.push_back("nPV");
     addvar.push_back("nTruePV");
-    
+    addvar.push_back("CKMType");//sd_prod
     std::vector<std::string>algos;
     algos.push_back("CSV");
     algos.push_back("CMVA");
@@ -4449,7 +4510,7 @@ void DMAnalysisTreeMaker::initTreeWeightHistory(bool useLHEW){
   trees["WeightHistory"]->Branch("Event_W_Pt",&float_values["Event_W_Pt"]);
   trees["WeightHistory"]->Branch("Event_Z_Pt",&float_values["Event_Z_Pt"]);
   trees["WeightHistory"]->Branch("Event_nTruePV",&float_values["Event_nTruePV"]);
-
+  trees["WeightHistory"]->Branch("Event_CKMType",&float_values["Event_CKMType"]);//sd_prod
   //  cout << " preBranch Weight "<<endl;
 
   //  size_t wgtsize=  lhes->weights().size();

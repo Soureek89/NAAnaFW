@@ -122,8 +122,21 @@ QCD.components = [ QCD_100_200, QCD_200_300,  QCD_300_500, QCD_500_700, QCD_700_
 #QCD.components = [ QCD_100_200, QCD_200_300,  QCD_300_500, QCD_500_700, QCD_700_1000, QCD_1000_1500]
 
 
+QCDMu_ = sample()
+QCDMu_.files = outlist (d,"QCDMuPt20toInf")
+QCDMu_.jpref = jetLabel 
+QCDMu_.jp = jetLabel 
+QCDMu_.sf = 1
+QCDMu_.skimEff = 1.
+QCDMu_.sigma = 720648000*0.00042*0.4
+QCDMu_.color = ROOT.kGray
+QCDMu_.style = 1
+QCDMu_.fill = 1001
+QCDMu_.leglabel = "QCD"
+QCDMu_.label = "QCDMuPt20toInf"
+
 QCDMu = sample()
-QCDMu.files = outlist (d,"QCDMuEPt20toInf")
+QCDMu.files = outlist (d,"QCDMuPt20toInf")
 QCDMu.jpref = jetLabel 
 QCDMu.jp = jetLabel 
 QCDMu.sf = 1
@@ -133,8 +146,8 @@ QCDMu.color = ROOT.kGray
 QCDMu.style = 1
 QCDMu.fill = 1001
 QCDMu.leglabel = "QCD"
-QCDMu.label = "QCDMuEPt20toInf"
-
+QCDMu.label = "QCDMuPt20toInf"
+QCDMu.components = [QCDMu_]
 
 QCD = sample()
 #QCD.color = 4

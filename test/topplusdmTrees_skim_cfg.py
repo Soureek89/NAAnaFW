@@ -270,20 +270,25 @@ if options.channel == "ttbar" or options.channel == "ttbar_sd":
     process.DMTreesDumper.getPartonTop  = cms.untracked.bool(True)
     process.DMTreesDumper.channelInfo.doTopReweighting = cms.untracked.bool(True)
 
-if options.channel == "ttbar_sd" or options.channel== "tch_sd":
+if options.channel == "ttbar_sd" or options.channel== "tch_sd_reshape":
     process.DMTreesDumper.channelInfo.getPartonTop  = cms.untracked.bool(True)
     process.DMTreesDumper.channelInfo.doTopDecayReshaping = cms.untracked.bool(True)
     process.DMTreesDumper.channelInfo.resBFile = cms.untracked.string("testErrors.root")
 
-if  options.channel== "tch_psd":
+if  options.channel== "tch_psd_reshape":
     process.DMTreesDumper.channelInfo.getPartonTop  = cms.untracked.bool(True)
     process.DMTreesDumper.channelInfo.doTopDecayReshaping = cms.untracked.bool(True)
     process.DMTreesDumper.channelInfo.isProd = cms.untracked.bool(True)
     
+if options.channel == "tch_psd":
+    process.DMTreesDumper.channelInfo.getPartonTop  = cms.untracked.bool(True)
+    process.DMTreesDumper.channelInfo.getCKMType = cms.untracked.bool(True)    
+
 if options.channel == "wzjets":
     print "channel is " + options.channel 
     process.DMTreesDumper.channelInfo.getPartonW  = cms.untracked.bool(True)
     process.DMTreesDumper.channelInfo.getParticleWZ  = cms.untracked.bool(True)
+
 if options.channel == "qcd":
     process.DMTreesDumper.channelInfo.useLHE = cms.untracked.bool(False)
     process.DMTreesDumper.channelInfo.useLHEWeights = cms.untracked.bool(False)

@@ -1,5 +1,7 @@
 met_range_had = (200,480, True)
 met_rebin_had = 2 
+common_rebin = 5 
+rebin_sr = 10
 from common import met_range
 
 settings = {
@@ -82,6 +84,11 @@ settings = {
 #    'h_electronnJets_CR3nw'  : ('Number of tight jets'         , 20, 1, (4,12)),
 #    'h_electronnbJets_CR3nw' : ('Number of tight b-jets'       , 20, 1, (2,6) ),
 #
+    "h_2j1t_mtw": (     "2j1t mtw ",250,common_rebin*2,(0,500)),
+    "h_2j1t_topPt": (   "2j1t top pt",250,common_rebin,(0,500)),
+    "h_3j1t_mtw": (     "3j1t mtw ",100,common_rebin*2,(0,500)),
+    "h_3j2t_mtw": (        "3j2t mtw ",250,common_rebin*2,(0,500)),
+
 #    'h_jet1Pt_CR3nw'        : ('Leading jet Pt distribution' , 20, 20, (30,390) ),
 #    'h_jet2Pt_CR3nw'        : ('Sub-leading jet Pt  distribution' , 20, 20, (30,270) ),
 #    'h_jet3Pt_CR3nw'        : ('Third Jet Pt distribution'    , 20, 20, (30,190) ),
@@ -267,4 +274,9 @@ settings = {
 store = [
     "h_nMu", #SR shape
     "h_nJets", #SR shape
+    "h_2j1t_mtw",
+    "h_2j1t_topPt",
+    "h_3j1t_mtw",
+    "h_3j2t_mtw",
+
     ]

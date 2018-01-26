@@ -234,11 +234,7 @@ int main(int argc, char **argv) {
     float jetJerUpE[sizeMax], jetJerUpPt[sizeMax], jetJerUpPhi[sizeMax], jetJerUpEta[sizeMax];
     float jetJerDownE[sizeMax], jetJerDownPt[sizeMax], jetJerDownPhi[sizeMax], jetJerDownEta[sizeMax];
 
-    float jet20JerUpE[sizeMax], jet20JerUpPt[sizeMax], jet20JerUpPhi[sizeMax], jet20JerUpEta[sizeMax];
     float jet20JerDownE[sizeMax], jet20JerDownPt[sizeMax], jet20JerDownPhi[sizeMax], jet20JerDownEta[sizeMax];
-
-
-
 
     float jetIsCSVL[sizeMax], jetIsCSVM[sizeMax], jetIsCSVT[sizeMax],jetIsLoose[sizeMax],jetIsTight[sizeMax],jetak4chs_csvv2[sizeMax],jetJesUpak4chs_csvv2[sizeMax],jetJesDownak4chs_csvv2[sizeMax],jetJerUpak4chs_csvv2[sizeMax],jetJerDownak4chs_csvv2[sizeMax];
 
@@ -283,9 +279,11 @@ int main(int argc, char **argv) {
     float muLooseIsoGE0p15Iso[sizeMax],muLooseIsoGE0p15Pt[sizeMax],muLooseIsoGE0p15Eta[sizeMax],muLooseIsoGE0p15Phi[sizeMax],muLooseIsoGE0p15E[sizeMax];
     float muTightIsoGE0p15Iso[sizeMax],muTightIsoGE0p15Pt[sizeMax],muTightIsoGE0p15Eta[sizeMax],muTightIsoGE0p15Phi[sizeMax],muTightIsoGE0p15E[sizeMax];
 
+    float elAntivetoE[sizeMax],elAntivetoPhi[sizeMax],elAntivetoEta[sizeMax],elAntivetoPt[sizeMax],elAntivetoIso[sizeMax];
+
     float elAntiIsoE[sizeMax],elAntiIsoPhi[sizeMax],elAntiIsoEta[sizeMax],elAntiIsoPt[sizeMax],elAntiIsoIso[sizeMax];
     float muAntiIsoE[sizeMax], muAntiIsoPt[sizeMax], muAntiIsoEta[sizeMax], muAntiIsoIso[sizeMax], muAntiIsoIsTight[sizeMax],muAntiIsoIsLoose[sizeMax], muAntiIsoPhi[sizeMax];
-    int   muAntiIsoSize,elAntiIsoSize;
+    int   muAntiIsoSize,elAntiIsoSize, elAntivetoSize;
     float muCharge[sizeMax], elCharge[sizeMax];
     float muAntiIsoCharge[sizeMax];
     float topcharge,topsize,antitopsize;
@@ -328,6 +326,10 @@ int main(int argc, char **argv) {
     float lepWeightBCDEF1Mu(1.);
     float lepWeightGH1Mu(1.);
 
+    float lepWeightBCDEFGH1El(1.);
+
+    float ckmtype(0.);
+
     Mt2Com_bisect *Mt2cal = new Mt2Com_bisect();
     //  float bWeight0CSVT, bWeight0CSVTBTagUp,bWeight0CSVTBTagDown,bWeight0CSVTMisTagUp,bWeight0CSVTMisTagDown;
     //  float bWeight1CSVT, bWeight1CSVTBTagUp,bWeight1CSVTBTagDown,bWeight1CSVTMisTagUp,bWeight1CSVTMisTagDown;
@@ -341,14 +343,16 @@ int main(int argc, char **argv) {
 
     
     bool addJES=true,addJER=true;
-    addJER=false;
+    
+    //addJER=false;
     //addJES=false;
     // addJES=false for sync exe
     if(doSynch){ addJES = false; addJER=false;}
     bool addPDF=false,addQ2=false,addTopPt=false,addVHF=false,addTTSplit=false;
     bool evalAcceptance=false;
     
-    if(sample.find("ST_T_tch")!=std::string::npos || sample.find("ST_Tbar_tch")!=std::string::npos)evalAcceptance=true;
+    if(sample.find("ST_T_tch")!=std::string::
+       || sample.find("ST_Tbar_tch")!=std::string::npos)evalAcceptance=true;
     addQ2=true;addPDF=true;
     if(isData=="DATA") {addJES=false,addJER=false,addQ2=false,addPDF=false;}
     //addJES=false;
@@ -467,12 +471,19 @@ int main(int argc, char **argv) {
     //    chain.SetBranchAddress("electronsTightAntiIso_Pt",    elAntiIsoPt);
 
 
-    chain.SetBranchAddress("electronsAntiveto_Iso03", elAntiIsoIso);
-    chain.SetBranchAddress("electronsAntiveto_size", &elAntiIsoSize);
-    chain.SetBranchAddress("electronsAntiveto_E",     elAntiIsoE);
-    chain.SetBranchAddress("electronsAntiveto_Phi",   elAntiIsoPhi);
-    chain.SetBranchAddress("electronsAntiveto_Eta",   elAntiIsoEta);
-    chain.SetBranchAddress("electronsAntiveto_Pt",    elAntiIsoPt);
+    //chain.SetBranchAddress("electronsAntiveto_Iso03", elAntiIsoIso);
+    //chain.SetBranchAddress("electronsAntiveto_size", &elAntiIsoSize);
+    //chain.SetBranchAddress("electronsAntiveto_E",     elAntiIsoE);
+    //chain.SetBranchAddress("electronsAntiveto_Phi",   elAntiIsoPhi);
+    //chain.SetBranchAddress("electronsAntiveto_Eta",   elAntiIsoEta);
+    //chain.SetBranchAddress("electronsAntiveto_Pt",    elAntiIsoPt);
+
+    chain.SetBranchAddress("electronsAntiveto_Iso03", elAntivetoIso);
+    chain.SetBranchAddress("electronsAntiveto_size", &elAntivetoSize);
+    chain.SetBranchAddress("electronsAntiveto_E",     elAntivetoE);
+    chain.SetBranchAddress("electronsAntiveto_Phi",   elAntivetoPhi);
+    chain.SetBranchAddress("electronsAntiveto_Eta",   elAntivetoEta);                                                                                                                     
+    chain.SetBranchAddress("electronsAntiveto_Pt",    elAntivetoPt);
     
     chain.SetBranchAddress("muonsTight_E", muE);
     chain.SetBranchAddress("muonsTight_Phi", muPhi);
@@ -879,8 +890,8 @@ int main(int argc, char **argv) {
     chain.SetBranchAddress("Event_passesSingleMuTriggers", &passMuTrig);
     chain.SetBranchAddress("Event_passesHadronicTriggers", &passHadTrig);
   
-
-
+    chain.SetBranchAddress("Event_CKMType", &ckmtype);
+    
     /********************************************************************************/
     /**************                    MiniTree branching              ***************/
     /********************************************************************************/
@@ -927,7 +938,6 @@ int main(int argc, char **argv) {
     float * mt2w_2j1t = new float(-999.0); namesToVars["mt2w"] = mt2w_2j1t;
     float * mtw_2j1t = new float(-999.0); namesToVars["mtw"] = mtw_2j1t;
     float * met_2j1t = new float(-999.0); namesToVars["MET"] = met_2j1t;
-
     
     //extra jet 
     float * leadingextrajeteta_2j1t = new float(-999.0); namesToVars["leadingextrajeteta"] = leadingextrajeteta_2j1t;
@@ -1136,6 +1146,7 @@ int main(int argc, char **argv) {
       syst1BM.branchTreesSysts(trees1T,"3j1t","leadingextrajetflavour", outTreeFile, leadingextrajetflavour_3j1t);
 
       
+      //3j2t
       syst2BM.branchTreesSysts(trees2T,"3j2t","w", outTreeFile, w_3j2t);
 
       syst2BM.branchTreesSysts(trees2T,"3j2t","mtw", outTreeFile, mtw_3j2t);
@@ -1245,6 +1256,9 @@ int main(int argc, char **argv) {
     TH1F *h_nTruePV[maxSysts];    systZero.initHistogramsSysts(h_nTruePV,"h_nTruePV","TruePV",34,0,74);
     TH1F *h_nJets[maxSysts];      systZero.initHistogramsSysts(h_nJets,"h_nJets","Number of tight jets",13,-0.5,12.5);
     TH1F *h_nbJets[maxSysts];     systZero.initHistogramsSysts(h_nbJets,"h_nbJets","Number of tight b-jets",11,-0.5,10.5);
+    TH1F *h_nJets_0b[maxSysts];      systZero.initHistogramsSysts(h_nJets_0b,"h_nJets_0b","Number of tight jets 0 bjets",13,-0.5,12.5);
+    TH1F *h_nJets_1b[maxSysts];      systZero.initHistogramsSysts(h_nJets_1b,"h_nJets_1b","Number of tight jets 1 bjets",13,-0.5,12.5);
+    TH1F *h_nJets_2b[maxSysts];      systZero.initHistogramsSysts(h_nJets_2b,"h_nJets_2b","Number of tight jets 2 bjets",13,-0.5,12.5);
 
     //2j0t 
     TH1F *h_2j0t_dR_lepjetpt40_1st[maxSysts];      systZero.initHistogramsSysts(h_2j0t_dR_lepjetpt40_1st,   "h_2j0t_dR_lepjetpt40_1st",  "dR lep-jet ",50,0,10);
@@ -1406,6 +1420,12 @@ int main(int argc, char **argv) {
   TH1F *h_3j1t_jeteta40_1st[maxSysts];    systZero.initHistogramsSysts(h_3j1t_jeteta40_1st,   "h_3j1t_jeteta40_1st","3j1t leading jet eta",     100,0.,4.7);
   TH1F *h_3j1t_jeteta40_2nd[maxSysts];    systZero.initHistogramsSysts(h_3j1t_jeteta40_2nd,   "h_3j1t_jeteta40_2nd","3j1t 2nd leading jet eta", 100,0.,4.7);
   TH1F *h_3j1t_jeteta40_3rd[maxSysts];    systZero.initHistogramsSysts(h_3j1t_jeteta40_3rd,   "h_3j1t_jeteta40_3rd","3j1t 3rd leading jet eta", 100,0.,4.7);
+
+  TH1F *h_3j1t_mtwcut_topMass[maxSysts];  systZero.initHistogramsSysts(h_3j1t_mtwcut_topMass, "h_3j1t_mtwcut_topMass", "3j1t top mass",200,100,500);
+  TH1F *h_3j1t_mtwcut_topMassExtra[maxSysts];  systZero.initHistogramsSysts(h_3j1t_mtwcut_topMassExtra, "h_3j1t_mtwcut_topMassExtra", "3j1t top mass extra",200,100,500);
+  TH1F *h_3j1t_mtwcut_sr_topMass[maxSysts];  systZero.initHistogramsSysts(h_3j1t_mtwcut_sr_topMass, "h_3j1t_mtwcut_sr_topMass", "3j1t top mass",200,100,500);
+  TH1F *h_3j1t_mtwcut_sr_topMassExtra[maxSysts];  systZero.initHistogramsSysts(h_3j1t_mtwcut_sr_topMassExtra, "h_3j1t_mtwcut_sr_topMassExtra", "3j1t top mass extra",200,100,500);
+
   //3j2t
   TH1F *h_3j2t_bjetpt[maxSysts];   systZero.initHistogramsSysts(h_3j2t_bjetpt,    "h_3j2t_bjetpt",     "3j2t b jet pt ",100,0,500);
   TH1F *h_3j2t_bjeteta[maxSysts];   systZero.initHistogramsSysts(h_3j2t_bjeteta,    "h_3j2t_bjeteta",     "3j2t b jet eta ",100,0,4.7);
@@ -1443,24 +1463,50 @@ int main(int argc, char **argv) {
   
   //Pileup Reweighting
   edm::LumiReWeighting LumiWeights_, LumiWeightsUp_, LumiWeightsDown_;
-  //New-SF files
-  TFile* file_eff_trig_bcdef = TFile::Open("data/EfficienciesAndSF_BCDEF_Trigger_SF.root");
-  TFile* file_eff_trig_gh    = TFile::Open("data/EfficienciesAndSF_GH_Trigger_SF.root");
-  
-  TFile* file_sf_id_bcdef = TFile::Open("data/EfficienciesAndSF_BCDEF_ID_SF.root");
-  TFile* file_sf_id_gh    = TFile::Open("data/EfficienciesAndSF_GH_ID_SF.root");
-  
-  TFile* file_sf_iso_bcdef = TFile::Open("data/EfficienciesAndSF_BCDEF_ISO_SF.root");
-  TFile* file_sf_iso_gh = TFile::Open("data/EfficienciesAndSF_GH_ISO_SF.root"); 
 
-  Weights muTightTrigEff_BCDEF(file_eff_trig_bcdef,"IsoMu24_OR_IsoTkMu24_PtEtaBins/efficienciesDATA/abseta_pt_DATA");
-  Weights muTightTrigEff_GH(file_eff_trig_gh,"IsoMu24_OR_IsoTkMu24_PtEtaBins/efficienciesDATA/abseta_pt_DATA");
+  //SF with Rel.Iso 0.06 -- muon 
+  TFile* file_eff_trig_bcdef = TFile::Open("data/EfficienciesAndSF_BCDEF_Trigger_SF_0p06.root");
+  TFile* file_eff_trig_gh    = TFile::Open("data/EfficienciesAndSF_GH_Trigger_SF_0p06.root");
   
-  Weights muTightIdSF_BCDEF(file_sf_id_bcdef,"MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
-  Weights muTightIdSF_GH(file_sf_id_gh,"MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
+  TFile* file_sf_id_bcdef = TFile::Open("data/EfficienciesAndSF_BCDEF_ID_SF_0p06.root");
+  TFile* file_sf_id_gh    = TFile::Open("data/EfficienciesAndSF_GH_ID_SF_0p06.root");
   
-  Weights muTightIsoSF_BCDEF(file_sf_iso_bcdef,"TightISO_TightID_pt_eta/abseta_pt_ratio");
-  Weights muTightIsoSF_GH(file_sf_iso_gh,"TightISO_TightID_pt_eta/abseta_pt_ratio"); 
+  TFile* file_sf_iso_bcdef = TFile::Open("data/EfficienciesAndSF_BCDEF_ISO_SF_0p06.root");
+  TFile* file_sf_iso_gh = TFile::Open("data/EfficienciesAndSF_GH_ISO_SF_0p06.root"); 
+
+  Weights muTightTrigEff_BCDEF(file_eff_trig_bcdef,"IsoMu24_OR_IsoTkMu24_from_Tight2012_and_dBeta_0p06_pteta/efficienciesDATA/abseta_pt_DATA");
+  Weights muTightTrigEff_GH(file_eff_trig_gh,"IsoMu24_OR_IsoTkMu24_from_Tight2012_and_dBeta_0p06_pteta/efficienciesDATA/abseta_pt_DATA");
+  
+  Weights muTightIdSF_BCDEF(file_sf_id_bcdef,"Tight2012_zIPCut_NUM_TightID_DEN_genTracks_PAR_pteta/abseta_pt_ratio");
+  Weights muTightIdSF_GH(file_sf_id_gh,"Tight2012_zIPCut_NUM_TightID_DEN_genTracks_PAR_pteta/abseta_pt_ratio");
+  
+  Weights muTightIsoSF_BCDEF(file_sf_iso_bcdef,"TightIso4_NUM_TightRelIso_DEN_TightIDandIPCut_PAR_pteta/abseta_pt_ratio");
+  Weights muTightIsoSF_GH(file_sf_iso_gh,"TightIso4_NUM_TightRelIso_DEN_TightIDandIPCut_PAR_pteta/abseta_pt_ratio"); 
+ 
+  // SF with Rel.Iso 0.06 -- elec
+  TFile* file_sf_elec = TFile::Open("data/HLT_Ele32_eta2p1_WPTight_Gsf_FullRunRange.root");
+  Weights elTightEff_BCDEFGH(file_sf_elec, "SF");
+
+
+
+  //New-SF files
+  //TFile* file_eff_trig_bcdef = TFile::Open("data/old_SF/EfficienciesAndSF_BCDEF_Trigger_SF.root");
+  //TFile* file_eff_trig_gh    = TFile::Open("data/old_SF/EfficienciesAndSF_GH_Trigger_SF.root");
+  //
+  //TFile* file_sf_id_bcdef = TFile::Open("data/old_SF/EfficienciesAndSF_BCDEF_ID_SF.root");
+  //TFile* file_sf_id_gh    = TFile::Open("data/old_SF/EfficienciesAndSF_GH_ID_SF.root");
+  //
+  //TFile* file_sf_iso_bcdef = TFile::Open("data/old_SF/EfficienciesAndSF_BCDEF_ISO_SF.root");
+  //TFile* file_sf_iso_gh = TFile::Open("data/old_SF/EfficienciesAndSF_GH_ISO_SF.root"); 
+
+  //Weights muTightTrigEff_BCDEF(file_eff_trig_bcdef,"IsoMu24_OR_IsoTkMu24_PtEtaBins/efficienciesDATA/abseta_pt_DATA");
+  //Weights muTightTrigEff_GH(file_eff_trig_gh,"IsoMu24_OR_IsoTkMu24_PtEtaBins/efficienciesDATA/abseta_pt_DATA");
+  //
+  //Weights muTightIdSF_BCDEF(file_sf_id_bcdef,"MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
+  //Weights muTightIdSF_GH(file_sf_id_gh,"MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio");
+  //
+  //Weights muTightIsoSF_BCDEF(file_sf_iso_bcdef,"TightISO_TightID_pt_eta/abseta_pt_ratio");
+  //Weights muTightIsoSF_GH(file_sf_iso_gh,"TightISO_TightID_pt_eta/abseta_pt_ratio"); 
 
   //TFile* file_eff_trig = TFile::Open("data/SingleMuonTrigger_Z_RunBCD_prompt80X_7p65.root");
   //TFile* file_sf_id = TFile::Open("data/MuonID_Z_RunBCD_prompt80X_7p65.root");
@@ -1494,7 +1540,8 @@ int main(int argc, char **argv) {
     int maxMuLoop = min(6, muSize);
     if(channel == "muonantiiso") maxMuLoop = min(20, muTightIsoGE0p15Size);
     int maxElLoop = min(6, elSize);
-    if(channel == "electronantiiso") maxElLoop = min(20, elAntiIsoSize);
+    //if(channel == "electronantiiso") maxElLoop = min(20, elAntiIsoSize);
+    if(channel == "electronantiiso") maxElLoop = min(20, elAntivetoSize);
     
     //step 1 Trigger
     if(isData=="DATA"){
@@ -1509,6 +1556,7 @@ int main(int argc, char **argv) {
         TrigIsoMu20=false;
         TrigIsoMu22=false;
         TrigIsoMu24=true;//Trigger efficiency:use the measured one atm --> always pass the trigger in MC// (slTrigIsoMu22_v1 || slTrigIsoMu22_v2 || slTrigIsoMu22_v3);  
+        //TrigIsoMu24=false;//Trigger efficiency:use the measured one atm --> always pass the trigger in MC// (slTrigIsoMu22_v1 || slTrigIsoMu22_v2 || slTrigIsoMu22_v3);  
 	//TrigGSFEl32=true;
         if (channel == "electron" || channel == "electronantiiso") TrigGSFEl32 = slHLTEle32_eta2p1_WPTight_Gsf_v1||slHLTEle32_eta2p1_WPTight_Gsf_v2||slHLTEle32_eta2p1_WPTight_Gsf_v3||slHLTEle32_eta2p1_WPTight_Gsf_v4||slHLTEle32_eta2p1_WPTight_Gsf_v5||slHLTEle32_eta2p1_WPTight_Gsf_v6||slHLTEle32_eta2p1_WPTight_Gsf_v7||slHLTEle32_eta2p1_WPTight_Gsf_v8||slHLTEle32_eta2p1_WPTight_Gsf_v9;
 	//	TrigGSFEl32=true;
@@ -1559,6 +1607,35 @@ int main(int argc, char **argv) {
         }
         } 
 
+    std::size_t found = sample.find("bar");
+
+    //corrections for T
+    if(ckmtype==1 && found==std::string::npos){
+      w*=0.070;
+      //      cout << "=====================================" << endl;
+      //      cout << "ckmtype is 1 and found is no position" << endl;
+      //      cout << ckmtype << "   " << sample << endl;
+    }
+    if(ckmtype==2 && found==std::string::npos){
+      w*=0.254;
+      //      cout << "=====================================" << endl;
+      //      cout << "ckmtype is 2 and found is no position" << endl;
+      //      cout << ckmtype << "   " << sample << endl;
+    }
+    //corrections for Tbar
+    if(ckmtype==1 && found!=std::string::npos){
+      w*=0.034;
+      //      cout << "=====================================" << endl;
+      //      cout << "ckmtype is 1 and found is no position" << endl;
+      //      cout << ckmtype << "   " << sample << endl;
+    }
+    if(ckmtype==2 && found!=std::string::npos){
+      w*=0.385;
+      //      cout << "=====================================" << endl;
+      //      cout << "ckmtype is 2 and found is no position" << endl;
+      //      cout << ckmtype << "   " << sample << endl;
+    }
+    
     TLorentzVector lep1;
     TLorentzVector lep2;
     TLorentzVector lep, mu, el, muloose;
@@ -1578,14 +1655,24 @@ int main(int argc, char **argv) {
     }
     else if (channel == "electronantiiso"){
       for(int e= 0; e<maxElLoop;++e ){  
-      if(elAntiIsoPt[e]>35 && fabs(elAntiIsoEta[e])<2.1 && elAntiIsoIso[e]> 0.2){
-        el.SetPtEtaPhiE(elAntiIsoPt[e], elAntiIsoEta[e], elAntiIsoPhi[e],elAntiIsoE[e]);
-        //cout << "Antiiso el pt: "<<elAntiIsoPt[e] << ", eta: "<<elAntiIsoEta[e] << ", Iso: "<<elAntiIsoIso[e]<<endl;
+      if(elAntivetoPt[e]>35 && fabs(elAntivetoEta[e])<2.1 ){
+        el.SetPtEtaPhiE(elAntivetoPt[e], elAntivetoEta[e], elAntivetoPhi[e],elAntivetoE[e]);
+        //if (evtNumber == 729036084) cout << "Antiiso el pt: "<<elAntivetoPt[e] << ", eta: "<<elAntivetoEta[e] << ", Iso: "<<elAntivetoIso[e]<<endl;
         tightEl.push_back(el);
-        selectedIso.push_back(elAntiIsoIso[e]);
+        selectedIso.push_back(elAntivetoIso[e]);
       }
       }
     }
+    //else if (channel == "electronantiiso"){
+    //  for(int e= 0; e<maxElLoop;++e ){
+    //    if(elPt[e]>35 && fabs(elEta[e])<2.1){
+    //      el.SetPtEtaPhiE(elAntiIsoPt[e], elAntiIsoEta[e], elAntiIsoPhi[e],elAntiIsoE[e]);
+    //      //cout << "Antiiso el pt: "<<elAntiIsoPt[e] << ", eta: "<<elAntiIsoEta[e] << ", Iso: "<<elAntiIsoIso[e]<<endl;
+    //      tightEl.push_back(el);
+    //      selectedIso.push_back(elAntiIsoIso[e]);
+    //    }
+    //  }
+    //}
 
     vector<float> mindeltaRmuonloop;
     if(channel!="muonantiiso"){
@@ -1619,7 +1706,7 @@ int main(int argc, char **argv) {
     nEl = tightEl.size();
     vector <lept> leptons;
     //    if((nMu!=1) && (nEl!= 1))continue;
-
+    
 
     if(isData=="MC"){
       if(tightMu.size()==1){
@@ -1656,8 +1743,22 @@ int main(int argc, char **argv) {
          lepWeight1MuLepDown = 0.;
         }
       }
+      
+      if(tightEl.size()==1){
+        lepWeightBCDEFGH1El = elTightEff_BCDEFGH.getEff(fabs(tightEl.at(0).Eta()),tightEl.at(0).Pt());
+        lepWeight1Ele = lepWeightBCDEFGH1El;
+        
+        float errEl = elTightEff_BCDEFGH.getErr(fabs(tightEl.at(0).Eta()),tightEl.at(0).Pt());
+        lepWeight1EleLepUp = lepWeight1Ele + errEl;
+        lepWeight1EleLepDown = lepWeight1Ele - errEl;
+        //cout <<"lepNominal :"<<lepWeightBCDEFGH1El<<": lep Up "<<lepWeight1EleLepUp<<": lep Down "<<lepWeight1EleLepDown<<endl;
+        if(channel == "electronantiiso"){
+          lepWeightBCDEFGH1El = 1.;
+          lepWeight1EleLepUp = 0.;
+          lepWeight1EleLepDown = 0.;
+        }
+      }
     }
-    
     for (size_t e = 0; e < (size_t)tightEl.size(); ++e){
         lept lepton;
         lepton.p4 = tightEl[e];
@@ -1883,16 +1984,22 @@ int main(int argc, char **argv) {
       bool passesDR=true;
       double dR=0; 
       //--------------------------------------------------------------------------------
-      
-      
+      //dR cut for DD QCD in muon Channel
       if(channel=="muonantiiso"){
 	for (size_t i = 0; i<(size_t)tightMu.size();++i){
 	  dR= deltaR(all_jets.Eta(),all_jets.Phi(),tightMu[i].Eta(),tightMu[i].Phi());
 	  if (dR<0.4) passesDR=false; //throw away the jet if deltaR btw jet and tightmu in less than 0.4
 	}
       } 
-      if(!passesDR)continue;
-      
+     
+      //dR cut for DD QCD in electron Channel
+      else if (channel=="electronantiiso"){
+       for (size_t i = 0; i<(size_t)tightEl.size();++i){
+         dR= deltaR(all_jets.Eta(),all_jets.Phi(),tightEl[i].Eta(),tightEl[i].Phi());
+         if (dR<0.4) passesDR=false;
+       } 
+      }
+      if(!passesDR)continue;                                           
       
       jets.push_back(all_jets);
       bool btagcond = jetLocPassesB>0. && fabs(jetLocEta)<2.4;
@@ -1932,10 +2039,13 @@ int main(int argc, char **argv) {
     std::sort(extrajets.begin(), extrajets.end(), by_pt_jet()); 
     bool passmuon = muonTrigger && nMu == 1 ;
     bool passelectron = electronTrigger && nEl == 1 ;
-
+    
     bool passlepton = ((passmuon && ((channel=="muon" || channel=="muonantiiso"))) || ((passelectron && ((channel=="electron" || channel=="electronantiiso" )))) );
-    if(passlepton  ==  true ){n_lepton+=w;nev_lepton+=1;}
-    //cout << "passlepton" <<passlepton<<endl;
+    if(passlepton){
+      n_lepton+=w;
+      nev_lepton+=1;
+      //cout <<" scenario "<< scen<< " "  <<tightMu.size()<<" "<<tightEl.size()<<" "<< evtNumber <<" passlepton " <<passlepton<< tightMu.at(0).Pt()<<" "<<nev_lepton <<endl;
+    }
     
     if(doSynch && passlepton && scenario=="nominal"){
       fileout_step1<<std::fixed<<std::setprecision(0)<<evtNumber<<endl;
@@ -1973,23 +2083,57 @@ int main(int argc, char **argv) {
     //cout <<"Evt No. after "<<evt<<" tightLepons "<<nMu<<" Loose Muons "<<muLooseSize<<endl; 
     if(channel=="singlelepton" && !passsinglelepton)continue;
   
+    //    cout << "n. jets pt>40 " << nJets << endl;
+    //    cout << "n. jets pt>40 " << jets.size() << endl;
+
+    //-------------------------------------------------------------------------------------------------------------
+    //                                   Histograms before the njmt selection 
+    //-------------------------------------------------------------------------------------------------------------
+    for(size_t i = 0; i < (size_t)tightLep.size();++i ){
+      if((tightLep.size()) == 1){
+	//	TVector2 met_( met*cos(metPhi[0]), met*sin(metPhi[0]));
+	//	float phi_lmet = fabs(deltaPhi(tightLep[i].Phi(), metPhi[0]) );
+	//	mt = sqrt(2* tightLep[i].Pt() * met* ( 1- cos(phi_lmet)));
+	//	if(mt>50.0) qcddepl = true;
+	//	for (size_t j= 0; j< (size_t)jets.size();++j ){
+	//	  btagcond = standardjets[j].passesB>0. && fabs(jets[j].Eta())<2.4;
+	//	  if(!(btagcond)){
+	//	    if(fabs(jets[j].Eta())>2.5) etacond = true;
+	//	    else etacond = false;
+	//	  }}
+	systZero.fillHistogramsSysts(h_nJets,nJets,w);
+	if(bjets.size()==0){
+	  systZero.fillHistogramsSysts(h_nJets_0b,nJets,w);
+	}
+	else if(bjets.size()==1){
+	  systZero.fillHistogramsSysts(h_nJets_1b,nJets,w);
+	}
+	else if(bjets.size()==2){
+	  systZero.fillHistogramsSysts(h_nJets_2b,nJets,w);
+	}
+	systZero.fillHistogramsSysts(h_nbJets,nCSVJets,w); 
+      }
+    }
+    //-------------------------------------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------------------------------
 
     bool goodcat= ( 
 		   (jets.size()==2 && bjets.size() == 1) ||
 		   (jets.size()==3 && bjets.size() == 1) ||
 		   (jets.size()==3 && bjets.size() == 2) ||
 		   (jets.size()==2 && bjets.size() == 0)
-		 );
+		    );
     //goodcat=false;
     if(goodcat){
-    if(jets.size() ==2){
-      n_2j+=w; nev_2j+=1;
-      if(doSynch && scenario=="nominal"){
-	fileout_step4<<std::fixed<<std::setprecision(0)<<evtNumber<<std::endl;
+      if(jets.size() ==2){
+	n_2j+=w; nev_2j+=1;
+	if(doSynch && scenario=="nominal"){
+	  fileout_step4<<std::fixed<<std::setprecision(0)<<evtNumber<<std::endl;
+	}
       }
-    }
     mt = -999;
     if(jets.size() ==2 && bjets.size()==1){ n_2j1t+=w; nev_2j1t+=1;  
+    //if(jets.size() ==2 && bjets.size()==0){ n_2j1t+=w; nev_2j1t+=1;  // Cross check for 2j0t for DD qcd in Electron channel
 
       if(doSynch && scenario=="nominal"){
 	fileout_step5<<std::fixed<<std::setprecision(0)<<evtNumber<<std::endl;
@@ -2401,6 +2545,7 @@ int main(int argc, char **argv) {
     
     //3j1t   
     if((jets.size() == 3 && bjets.size() ==1)) {
+      bool qcddepleted=false, signalenriched=false;
       *w_3j1t=w;
       for(size_t j= 0; j< (size_t)jets.size();++j ){
 	if(j==0){
@@ -2439,6 +2584,7 @@ int main(int argc, char **argv) {
 	  syst1BM.fillHistogramsSysts(h_3j1t_met,met,w);
 	  if(channel=="muon" || channel == "muonantiiso")syst1BM.fillHistogramsSysts(h_3j1t_muIso,selectedIso[i],w);
 	  if(mt>50){
+	    qcddepleted= true;
 	    syst1BM.fillHistogramsSysts(h_3j1t_mtwcut_MuPt,tightLep[i].Pt(),w);
 	    syst1BM.fillHistogramsSysts(h_3j1t_mtwcut_MuEta,fabs(tightLep[i].Eta()),w);
 	    if(channel=="muon" || channel == "muonantiiso")syst1BM.fillHistogramsSysts(h_3j1t_mtwcut_muIso,selectedIso[i],w);
@@ -2456,6 +2602,7 @@ int main(int argc, char **argv) {
 	    if(fabs(standardjets[i].vect.Eta())>maxEta){
 	      maxEta=fabs(standardjets[i].vect.Eta());
 	      jetprime_3j1t=standardjets[i].vect;
+	      if(maxEta>etathreshold) signalenriched = true;
 	      *etajprime_3j1t=maxEta;
 	      *jprimeflavour_3j1t=standardjets[i].partonFlavour;
 	    }
@@ -2474,7 +2621,7 @@ int main(int argc, char **argv) {
 	}}
       else{
 	for(size_t i=0; i<(size_t)standardjets.size(); ++i){
-	  cout <<"passeB"<< standardjets[i].passesB << "eta jet" << fabs(jets[i].Eta()) << endl;
+	  cout <<"passesB"<< standardjets[i].passesB << "eta jet" << fabs(jets[i].Eta()) << endl;
 	}}
       jetstopMass.push_back(bjet);
       jetstopMass.push_back(jetnobnoprime.vect);
@@ -2485,6 +2632,8 @@ int main(int argc, char **argv) {
       
       vector<TLorentzVector> tops = topUtils.top4Momenta(tightLep, jetstopMass, metpx, metpy);
       *topMass_3j1t=tops.at(0).M();
+      if(qcddepleted && !(signalenriched)) syst1BM.fillHistogramsSysts(h_3j1t_mtwcut_topMass,tops.at(0).M(),w);
+      if(qcddepleted && signalenriched) syst1BM.fillHistogramsSysts(h_3j1t_mtwcut_sr_topMass,tops.at(0).M(),w);
       *topMt_3j1t=topUtils.topMtw(tops.at(0), bjet, metpx, metpy);
       *topPt_3j1t=tops.at(0).Pt();
       *topEta_3j1t=tops.at(0).Eta();
@@ -2516,6 +2665,8 @@ int main(int argc, char **argv) {
       *leadingextrajeteta_3j1t=jetnobnoprime.vect.Eta();
       
       *topMassExtra_3j1t=tops.at(1).M();
+      if(qcddepleted && !(signalenriched)) syst1BM.fillHistogramsSysts(h_3j1t_mtwcut_topMass,tops.at(1).M(),w);
+      if(qcddepleted && signalenriched) syst1BM.fillHistogramsSysts(h_3j1t_mtwcut_sr_topMass,tops.at(1).M(),w);
       *topMtExtra_3j1t=topUtils.topMtw(tops.at(1), jetnobnoprime.vect, metpx, metpy);
       *topPtExtra_3j1t=tops.at(1).Pt();
       *topEtaExtra_3j1t=tops.at(1).Eta();
@@ -2681,9 +2832,9 @@ int main(int argc, char **argv) {
 
   h_cutFlow->SetBinContent(1,nEvents);
   h_cutFlow->GetXaxis()->SetBinLabel(1,"no selection");
-  h_cutFlow->SetBinContent(2, n_trig);
+  h_cutFlow->SetBinContent(2, nev_trig);
   h_cutFlow->GetXaxis()->SetBinLabel(2, "trigger");
-  h_cutFlow->SetBinContent(3,n_lepton);
+  h_cutFlow->SetBinContent(3, nev_lepton);
   h_cutFlow->GetXaxis()->SetBinLabel(3, "=1 Iso. Muon");
   h_cutFlow->SetBinContent(4,n_lepton_cross_veto);
   h_cutFlow->GetXaxis()->SetBinLabel(4, "=0 Loose Ele.");
@@ -2854,6 +3005,12 @@ int main(int argc, char **argv) {
   systZero.writeHistogramsSysts(h_3j1t_jeteta40_1st, allMyFiles);
   systZero.writeHistogramsSysts(h_3j1t_jeteta40_2nd, allMyFiles);
   systZero.writeHistogramsSysts(h_3j1t_jeteta40_3rd, allMyFiles);
+  systZero.writeHistogramsSysts(h_3j1t_mtwcut_topMass, allMyFiles);
+  systZero.writeHistogramsSysts(h_3j1t_mtwcut_sr_topMass, allMyFiles);
+  systZero.writeHistogramsSysts(h_3j1t_mtwcut_topMassExtra, allMyFiles);
+  systZero.writeHistogramsSysts(h_3j1t_mtwcut_sr_topMassExtra, allMyFiles);
+
+
   //3j2t
   systZero.writeHistogramsSysts(h_3j2t_bjetpt,  allMyFiles); 
   systZero.writeHistogramsSysts(h_3j2t_bjeteta,  allMyFiles); 
@@ -2883,12 +3040,15 @@ int main(int argc, char **argv) {
   systZero.writeHistogramsSysts(h_3j2t_jeteta40_1st, allMyFiles);
   systZero.writeHistogramsSysts(h_3j2t_jeteta40_2nd, allMyFiles);
   systZero.writeHistogramsSysts(h_3j2t_jeteta40_3rd, allMyFiles);
+
   systZero.writeHistogramsSysts(h_nJets, allMyFiles); 
+  systZero.writeHistogramsSysts(h_nJets_0b, allMyFiles);
+  systZero.writeHistogramsSysts(h_nJets_1b, allMyFiles);
+  systZero.writeHistogramsSysts(h_nJets_2b, allMyFiles);
   systZero.writeHistogramsSysts(h_nbJets, allMyFiles);
   
   //  cout << "bef trees "<<endl;
   if(addTrees){
-
     syst1BM.writeTreesSysts(trees1T,outTreeFile);
     syst2BM.writeTreesSysts(trees2T,outTreeFile);
   }
@@ -2897,5 +3057,4 @@ int main(int argc, char **argv) {
   systZero.closeFilesSysts(allMyFiles);
   
   std::cout<< "Info: Total No. of events for sample["<<sample<<"] : "<<nEvents<<std::endl;
-}
-
+    }

@@ -55,9 +55,9 @@ def main():
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = options.config
     config.JobType.allowUndistributedCMSSW = True
-    config.JobType.pyCfgParams = ["isData=False", "changeJECs=False"]
-    jecversion="V2"
-    jecera="Spring16_23Sep2016"
+    config.JobType.pyCfgParams = ["isData=False", "changeJECs=True"]
+    jecversion="V4"
+    jecera="Summer16_23Sep2016"
     config.JobType.inputFiles = [jecera+"BCD"+jecversion+"_DATA_UncertaintySources_AK4PFchs.txt" ,
                                  jecera+jecversion+"_MC_L2L3Residual_AK4PFchs.txt",#New MC
                                  jecera+jecversion+"_MC_L3Absolute_AK4PFchs.txt",
@@ -86,6 +86,7 @@ def main():
                                  jecera+"H"+jecversion+"_DATA_L2Relative_AK4PFchs.txt",
                                  jecera+"H"+jecversion+"_DATA_L3Absolute_AK4PFchs.txt",
                                  jecera+"H"+jecversion+"_DATA_L2L3Residual_AK4PFchs.txt",
+                                 jecera+jecversion+"_MC_UncertaintySources_AK4PFchs.txt",
                                  "cMVAv2_Moriond17_B_H.csv",
                                  "CSVv2_Moriond17_B_H.csv",
                                  "btagging_cmva.root",
@@ -97,7 +98,7 @@ def main():
     config.Data.ignoreLocality = True
     #    config.Data.outLFNDirBase = '/store/user/oiorio/ttDM/samples/2016/Oct/'
 #    config.Data.outLFNDirBase = '/store/user/oiorio/ttDM/trees/2016/Dec/12Dec/'
-    config.Data.outLFNDirBase = '/store/user/oiorio/ttDM/trees/2017/Feb/24Feb/'
+    config.Data.outLFNDirBase = '/store/user/oiorio/SingleTop/2017/Aug/27Aug/'
     config.Data.inputDBS = 'phys03'
     config.Data.splitting = 'FileBased'
     #    config.Data.totalUnits = -1
@@ -105,7 +106,10 @@ def main():
     config.Data.publication = False
 
     config.section_("Site")
-    config.Site.storageSite = 'T2_CH_CSCS'
+    #    config.Site.storageSite = 'T2_CH_CSCS'
+    #config.Site.whitelist = ['T2_CH_CERN','T2_IT_*','T2_DE_*','T2_CH_*']
+
+    config.Site.storageSite = 'T2_IT_Pisa'
     #config.Site.whitelist = ['T2_CH_CERN','T2_IT_*','T2_DE_*','T2_CH_*']
 
 
@@ -136,8 +140,8 @@ def main():
         
         #if s.find('ST_t-') > 0 :
         #   print ' single top\n   => add lhesource=source'
-        config.JobType.pyCfgParams = ["isData=False", "changeJECs=False"]
-        #        config.JobType.pyCfgParams = ["isData=False", "changeJECs=False","lhesource=source"]
+        config.JobType.pyCfgParams = ["isData=False", "changeJECs=True"]
+        #        config.JobType.pyCfgParams = ["isData=False", "changeJECs=True","lhesource=source"]
         print s.split('/')[1]
 
     for ijob, job in enumerate(jobs) :
@@ -150,13 +154,13 @@ def main():
         print options.channel
         if options.channel == None:
             if ("QCD_Pt" in job.split('/')[1]) or ("ST_tW" in job.split('/')[1]):
-                config.JobType.pyCfgParams= ["isData=False", "changeJECs=False","channel=qcd"]
+                config.JobType.pyCfgParams= ["isData=False", "changeJECs=True","channel=qcd"]
             else:
                 if ("TT_TuneCUETP8M" in job.split('/')[1]):
-                    config.JobType.pyCfgParams= ["isData=False", "changeJECs=False","channel=ttbar"]
-                else: config.JobType.pyCfgParams = ["isData=False", "changeJECs=False"]
+                    config.JobType.pyCfgParams= ["isData=False", "changeJECs=True","channel=ttbar"]
+                else: config.JobType.pyCfgParams = ["isData=False", "changeJECs=True"]
         else:
-            config.JobType.pyCfgParams = ["isData=False", "changeJECs=False","channel="+str(options.channel)]
+            config.JobType.pyCfgParams = ["isData=False", "changeJECs=True","channel="+str(options.channel)]
 
         #        ptbin
         config.General.requestName = '80xV2_' + ptbin #+ cond[10:] 

@@ -1215,7 +1215,6 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
     size_t nup=lhes->hepeup().NUP;
 
     //    cout << " I  ID MOTHER1 MOTHER2 MASS"<<endl;
-    cout << "event" << endl;
     for( size_t i=0;i<nup;++i){
       //      cout << " particle number " << i << endl;
       int id = lhes->hepeup().IDUP[i];

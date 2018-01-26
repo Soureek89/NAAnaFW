@@ -234,11 +234,7 @@ int main(int argc, char **argv) {
     float jetJerUpE[sizeMax], jetJerUpPt[sizeMax], jetJerUpPhi[sizeMax], jetJerUpEta[sizeMax];
     float jetJerDownE[sizeMax], jetJerDownPt[sizeMax], jetJerDownPhi[sizeMax], jetJerDownEta[sizeMax];
 
-    float jet20JerUpE[sizeMax], jet20JerUpPt[sizeMax], jet20JerUpPhi[sizeMax], jet20JerUpEta[sizeMax];
     float jet20JerDownE[sizeMax], jet20JerDownPt[sizeMax], jet20JerDownPhi[sizeMax], jet20JerDownEta[sizeMax];
-
-
-
 
     float jetIsCSVL[sizeMax], jetIsCSVM[sizeMax], jetIsCSVT[sizeMax],jetIsLoose[sizeMax],jetIsTight[sizeMax],jetak4chs_csvv2[sizeMax],jetJesUpak4chs_csvv2[sizeMax],jetJesDownak4chs_csvv2[sizeMax],jetJerUpak4chs_csvv2[sizeMax],jetJerDownak4chs_csvv2[sizeMax];
 
@@ -355,7 +351,8 @@ int main(int argc, char **argv) {
     bool addPDF=false,addQ2=false,addTopPt=false,addVHF=false,addTTSplit=false;
     bool evalAcceptance=false;
     
-    if(sample.find("ST_T_tch")!=std::string::npos || sample.find("ST_Tbar_tch")!=std::string::npos)evalAcceptance=true;
+    if(sample.find("ST_T_tch")!=std::string::
+       || sample.find("ST_Tbar_tch")!=std::string::npos)evalAcceptance=true;
     addQ2=true;addPDF=true;
     if(isData=="DATA") {addJES=false,addJER=false,addQ2=false,addPDF=false;}
     //addJES=false;
@@ -1428,6 +1425,7 @@ int main(int argc, char **argv) {
   TH1F *h_3j1t_mtwcut_topMassExtra[maxSysts];  systZero.initHistogramsSysts(h_3j1t_mtwcut_topMassExtra, "h_3j1t_mtwcut_topMassExtra", "3j1t top mass extra",200,100,500);
   TH1F *h_3j1t_mtwcut_sr_topMass[maxSysts];  systZero.initHistogramsSysts(h_3j1t_mtwcut_sr_topMass, "h_3j1t_mtwcut_sr_topMass", "3j1t top mass",200,100,500);
   TH1F *h_3j1t_mtwcut_sr_topMassExtra[maxSysts];  systZero.initHistogramsSysts(h_3j1t_mtwcut_sr_topMassExtra, "h_3j1t_mtwcut_sr_topMassExtra", "3j1t top mass extra",200,100,500);
+
   //3j2t
   TH1F *h_3j2t_bjetpt[maxSysts];   systZero.initHistogramsSysts(h_3j2t_bjetpt,    "h_3j2t_bjetpt",     "3j2t b jet pt ",100,0,500);
   TH1F *h_3j2t_bjeteta[maxSysts];   systZero.initHistogramsSysts(h_3j2t_bjeteta,    "h_3j2t_bjeteta",     "3j2t b jet eta ",100,0,4.7);
@@ -2158,6 +2156,8 @@ int main(int argc, char **argv) {
     }
     
     
+    systZero.fillHistogramsSysts(h_nJets,nJets,w); 
+    systZero.fillHistogramsSysts(h_nbJets,nCSVJets,w); 
     systZero.fillHistogramsSysts(h_nPV,nPV,w);
     systZero.fillHistogramsSysts(h_nGoodPV,nPV,w);
     systZero.fillHistogramsSysts(h_nTruePV,numTrueInt,1);
@@ -3049,7 +3049,6 @@ int main(int argc, char **argv) {
   
   //  cout << "bef trees "<<endl;
   if(addTrees){
-    
     syst1BM.writeTreesSysts(trees1T,outTreeFile);
     syst2BM.writeTreesSysts(trees2T,outTreeFile);
   }

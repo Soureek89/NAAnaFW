@@ -1,0 +1,1 @@
+samplesAndPaths = {'ST_t-channel_antitop_4f_hdampup_inclusiveDecays_13TeV-powhegV2-madspin-pythia8':'/cms/store/user/oiorio/SingleTop/2017/July/26uly/',}

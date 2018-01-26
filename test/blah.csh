@@ -1,0 +1,1 @@
+xrdcp "root://xrootd.ba.infn.it//store/user/oiorio/ttDM/samples/2017/Feb/18Feb/B2GAnaFW_80X_V2p5/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_B2GAnaFW_80X_V2p5/170220_140230/0000/B2GEDMNtuple_643.root" "/tmp/oiorio/"

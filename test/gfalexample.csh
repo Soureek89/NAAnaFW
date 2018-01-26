@@ -1,0 +1,1 @@
+gfal-ls -Hl srm://stormfe1.pi.infn.it/cms/store/user/oiorio/samples/June/05June/B2GAnaFW_80X_V3p2_June/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_B2GAnaFW_80X_V3p2_June/170605_115340/0000

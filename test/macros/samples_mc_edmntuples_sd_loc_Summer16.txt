@@ -1,0 +1,1 @@
+/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/oiorio-RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1_B2GAnaFW_80X_V3p2_June-abe82725a22c385c5abbaab3e6182693/USER

@@ -235,6 +235,7 @@ int main(int argc, char **argv) {
     float jetJerDownE[sizeMax], jetJerDownPt[sizeMax], jetJerDownPhi[sizeMax], jetJerDownEta[sizeMax];
 
     float jet20JerDownE[sizeMax], jet20JerDownPt[sizeMax], jet20JerDownPhi[sizeMax], jet20JerDownEta[sizeMax];
+    float jet20JerUpE[sizeMax], jet20JerUpPt[sizeMax], jet20JerUpPhi[sizeMax], jet20JerUpEta[sizeMax];
 
     float jetIsCSVL[sizeMax], jetIsCSVM[sizeMax], jetIsCSVT[sizeMax],jetIsLoose[sizeMax],jetIsTight[sizeMax],jetak4chs_csvv2[sizeMax],jetJesUpak4chs_csvv2[sizeMax],jetJesDownak4chs_csvv2[sizeMax],jetJerUpak4chs_csvv2[sizeMax],jetJerDownak4chs_csvv2[sizeMax];
 
@@ -351,8 +352,8 @@ int main(int argc, char **argv) {
     bool addPDF=false,addQ2=false,addTopPt=false,addVHF=false,addTTSplit=false;
     bool evalAcceptance=false;
     
-    if(sample.find("ST_T_tch")!=std::string::
-       || sample.find("ST_Tbar_tch")!=std::string::npos)evalAcceptance=true;
+    //    if(sample.find("ST_T_tch")!=std::string::npos
+    //   || sample.find("ST_Tbar_tch")!=std::string::npos)evalAcceptance=true;
     addQ2=true;addPDF=true;
     if(isData=="DATA") {addJES=false,addJER=false,addQ2=false,addPDF=false;}
     //addJES=false;
@@ -361,7 +362,9 @@ int main(int argc, char **argv) {
         }
 
     if(sample.find("_sd")!=std::string::npos){
-      doTtoSDDecay=true;
+      //      doTtoSDDecay=true;
+      doTtoSDDecay=false;
+      
     }
     //addPDF=false;
 

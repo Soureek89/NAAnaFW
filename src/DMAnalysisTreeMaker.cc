@@ -119,7 +119,8 @@ private:
   void setEventBTagSF(string label, string category, string algo);
   void setEventLeptonSF(string label, string category);
 
-
+  double calcSimpleSF(string algo, string syst, string wp, bool passes , double pFlavour, double ptCorr, double eta, bool noreshape=false);
+  
   double getWPtWeight(double ptW);
   double getZPtWeight(double ptZ);
 
@@ -393,7 +394,7 @@ edm::Handle<std::vector<std::vector<int>>> muKeys;
     BTagWeight(int jmin, int jmax) :
       minTags(jmin) , maxTags(jmax) {}
     bool filter(int t);
-    float weight(vector<JetInfo> jets, int tags);
+    float weight(vector<JetInfo> jets, int tags, bool verbose=false);
     float weightWithVeto(vector<JetInfo> jetsTags, int tags, vector<JetInfo> jetsVetoes, int vetoes);
   };
   vector<BTagWeight::JetInfo> jsfscsvt, 
@@ -1228,8 +1229,8 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
       float col1 = lhes->hepeup().ICOLUP[i].first;
       float col2 = lhes->hepeup().ICOLUP[i].second;
       //      float mass = lhes->hepeup().PUP[i][4];
-      if(i<5)  cout << "id " << "m1 " << "m2 " << "c1 " << "c2 " << endl; 
-      if(i<5)  cout << id <<" "<< moth1 <<"  "<< moth2 <<"  "<< col1 <<" "<< col2 << endl; 
+      //if(i<5)  cout << "id " << "m1 " << "m2 " << "c1 " << "c2 " << endl; 
+      //if(i<5)  cout << id <<" "<< moth1 <<"  "<< moth2 <<"  "<< col1 <<" "<< col2 << endl; 
       if(sd_prod && abs(id)==6){ // 
 	for( size_t j=0;j<5;++j){
 	  int id2 = lhes->hepeup().IDUP[j];
@@ -1478,7 +1479,7 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
       }
       if(   float_values["Event_W_QCD_Weight"] ==1 &&parw.size()>0 )    float_values["Event_W_QCD_Weight"]= getWPtWeight(parw.at(0).Pt());
     }
-    cout << "ckmtype = " << ckmtype << endl;
+    //    cout << "ckmtype = " << ckmtype << endl;
 
     //    cout << " after loop "<<endl;
     //    float_values["Event_W_EW_Weight"]=1.0;//*float_values["Event_W_QCD_Weight"];
@@ -2449,7 +2450,9 @@ void DMAnalysisTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetu
       float reshapeF_CMVA_HFStats2Down=getReshapedBTagValue(flavForShaping, cmva, pt, eta,"CMVA","down_hfstats2");
       float reshapeF_CMVA_LFUp=getReshapedBTagValue(flavForShaping, cmva, pt, eta,"CMVA","up_lf");
       float reshapeF_CMVA_LFDown=getReshapedBTagValue(flavForShaping, cmva, pt, eta,"CMVA","down_lf");
-      
+
+      //      cout << " testreshape 0 "<< reshapeF_CMVA<< " jesup "<<reshapeF_CMVA_JESUp << " jesdown "<< reshapeF_CMVA_JESDown << " HFStatUp "<< reshapeF_CMVA_HFStats1Up <<endl;
+	    
       float reshapeF_CMVA_CFErr1Up=getReshapedBTagValue(flavForShaping, cmva, pt, eta,"CMVA","up_cferr1");
       float reshapeF_CMVA_CFErr1Down=getReshapedBTagValue(flavForShaping, cmva, pt, eta,"CMVA","down_cferr1");
       
@@ -3918,7 +3921,15 @@ void DMAnalysisTreeMaker::setEventBTagSF(string label, string category, string a
   jsfscsvl_mistag_up.clear();
   jsfscsvl_mistag_down.clear();
 
-  
+  int n_reshapedbl=0., n_reshapedbt=0., n_reshapedbm=0.;
+  //Simple reshaping method for systs
+  float reshapingproductl=1.0,reshapingproductt=1.0,reshapingproductm=1.0;
+  float reshapingproductl_b_tag_up=1.0,reshapingproductt_b_tag_up=1.0,reshapingproductm_b_tag_up=1.0;
+  float reshapingproductl_b_tag_down=1.0,reshapingproductt_b_tag_down=1.0,reshapingproductm_b_tag_down=1.0;
+  float reshapingproductl_mistag_up=1.0,reshapingproductt_mistag_up=1.0,reshapingproductm_mistag_up=1.0;
+  float reshapingproductl_mistag_down=1.0,reshapingproductt_mistag_down=1.0,reshapingproductm_mistag_down=1.0;
+
+
   for(int j =0; j<sizes[label+category];++j){
     if(fabs(vfloats_values[lc+"_Eta"][j])>2.4)continue;
     if(vfloats_values[lc+"_Is"+algo+"T"][j])++ncsv_tmp_t_tags;
@@ -3941,13 +3952,126 @@ void DMAnalysisTreeMaker::setEventBTagSF(string label, string category, string a
     if(doTopDecayReshaping){
       double pFlavour=vfloats_values[lc+"_PartonFlavour"][j];
       double product=topCharge*pFlavour;
-      if(fabs(pFlavour)==5){
-	flavor = 1;
+      
+      bool noreshape =fabs(pFlavour)==5;
+      if (noreshape){
+	noreshape= (fabs(pFlavour)==5 && product >0);
+	flavor=1;
       }
-    }
+
+      if(vfloats_values[lc+"_Is"+algo+"T"][j])  ++n_reshapedbt;
+      if(vfloats_values[lc+"_Is"+algo+"M"][j])  ++n_reshapedbm;
+      if(vfloats_values[lc+"_Is"+algo+"L"][j])  ++n_reshapedbl;
+
+      reshapingproductt*=calcSimpleSF(algo,"T","noSyst",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta,!noreshape);
+      reshapingproductm*=calcSimpleSF(algo,"M","noSyst",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta,!noreshape);
+      reshapingproductl*=calcSimpleSF(algo,"L","noSyst",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta,!noreshape);
+      
+      reshapingproductt_mistag_up*=calcSimpleSF(algo,"T","mistag_up",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta,!noreshape);
+      reshapingproductm_mistag_up*=calcSimpleSF(algo,"M","mistag_up",vfloats_values[lc+"_Is"+algo+"M"][j],pFlavour,ptCorr,eta,!noreshape);
+      reshapingproductl_mistag_up*=calcSimpleSF(algo,"L","mistag_up",vfloats_values[lc+"_Is"+algo+"L"][j],pFlavour,ptCorr,eta,!noreshape);
+      
+      reshapingproductt_mistag_down*=calcSimpleSF(algo,"T","mistag_down",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta,!noreshape);
+      reshapingproductm_mistag_down*=calcSimpleSF(algo,"M","mistag_down",vfloats_values[lc+"_Is"+algo+"M"][j],pFlavour,ptCorr,eta,!noreshape);
+      reshapingproductl_mistag_down*=calcSimpleSF(algo,"L","mistag_down",vfloats_values[lc+"_Is"+algo+"L"][j],pFlavour,ptCorr,eta,!noreshape);
+      
+      reshapingproductt_b_tag_down*=calcSimpleSF(algo,"T","b_tag_down",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta,!noreshape);
+      reshapingproductm_b_tag_down*=calcSimpleSF(algo,"M","b_tag_down",vfloats_values[lc+"_Is"+algo+"M"][j],pFlavour,ptCorr,eta,!noreshape);
+      reshapingproductl_b_tag_down*=calcSimpleSF(algo,"L","b_tag_down",vfloats_values[lc+"_Is"+algo+"L"][j],pFlavour,ptCorr,eta,!noreshape);
+      
+      reshapingproductt_b_tag_up*=calcSimpleSF(algo,"T","b_tag_up",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta,!noreshape);
+      reshapingproductm_b_tag_up*=calcSimpleSF(algo,"M","b_tag_up",vfloats_values[lc+"_Is"+algo+"M"][j],pFlavour,ptCorr,eta,!noreshape);
+      reshapingproductl_b_tag_up*=calcSimpleSF(algo,"L","b_tag_up",vfloats_values[lc+"_Is"+algo+"L"][j],pFlavour,ptCorr,eta,!noreshape);
+      
+      //      cout << " jet j " <<j << " flav "<< pFlavour<<" passes "<< vfloats_values[lc+"_Is"+algo+"T"][j]  <<" reshapftt " << reshapingproductt <<endl;
+      //    
+      //
+      //      if(fabs(pFlavour)==5){
+      //	flavor = 1;
+      //	if(fabs(pFlavour)==5 && product >0){
+      //
+      //	  //	  cout<< "function simple sf jet "<< j << " "<<calcSimpleSF(algo,"T","noSyst",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta)<<endl;
+      //	  
+      //	  reshapingproductt*=calcSimpleSF(algo,"T","noSyst",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta);
+      //	  reshapingproductm*=calcSimpleSF(algo,"M","noSyst",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta);
+      //	  reshapingproductl*=calcSimpleSF(algo,"L","noSyst",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta);
+      //
+      //
+      //	  reshapingproductt_mistag_up*=calcSimpleSF(algo,"T","mistag_up",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta);
+      //	  reshapingproductm_mistag_up*=calcSimpleSF(algo,"M","mistag_up",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta);
+      //	  reshapingproductl_mistag_up*=calcSimpleSF(algo,"L","mistag_up",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta);
+      //
+      //	  reshapingproductt_mistag_down*=calcSimpleSF(algo,"T","mistag_down",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta);
+      //	  reshapingproductm_mistag_down*=calcSimpleSF(algo,"M","mistag_down",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta);
+      //	  reshapingproductl_mistag_down*=calcSimpleSF(algo,"L","mistag_down",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta);
+      //
+      //	  reshapingproductt_b_tag_down*=calcSimpleSF(algo,"T","b_tag_down",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta);
+      //	  reshapingproductm_b_tag_down*=calcSimpleSF(algo,"M","b_tag_down",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta);
+      //	  reshapingproductl_b_tag_down*=calcSimpleSF(algo,"L","b_tag_down",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta);
+      //
+      //	  reshapingproductt_b_tag_up*=calcSimpleSF(algo,"T","b_tag_up",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta);
+      //	  reshapingproductm_b_tag_up*=calcSimpleSF(algo,"M","b_tag_up",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta);
+      //	  reshapingproductl_b_tag_up*=calcSimpleSF(algo,"L","b_tag_up",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta);
+      //
+      //
+      //
+      //	  /*
+      //	    if(vfloats_values[lc+"_Is"+algo+"T"][j]){
+      //	    n_reshapedbt++;
+      //	    reshapingproductt*=(MCTagEfficiency(algo+"T",1,ptCorr,eta)/MCTagEfficiency(algo+"T",pFlavour,ptCorr,eta))*TagScaleFactor(algo+"T", 1, "noSyst", ptCorr,eta);
+      //	    cout<< " vanilla "<< (MCTagEfficiency(algo+"T",1,ptCorr,eta)/MCTagEfficiency(algo+"T",pFlavour,ptCorr,eta))*TagScaleFactor(algo+"T", 1, "noSyst", ptCorr,eta)<<endl;
+      //	    }
+      //	    else{
+      //	    //	    reshapingproductt*=(1-MCTagEfficiency(algo+"T",1,ptCorr,eta)*TagScaleFactor(algo+"T", 1, "noSyst", ptCorr,eta))/(1-MCTagEfficiency(algo+"T",pFlavour,ptCorr,eta));
+      //	    //cout << " vanilla "<< (1-MCTagEfficiency(algo+"T",1,ptCorr,eta)*TagScaleFactor(algo+"T", 1, "noSyst", ptCorr,eta))/(1-MCTagEfficiency(algo+"T",pFlavour,ptCorr,eta));
+      //	    }
+      //	    
+      //	    if(vfloats_values[lc+"_Is"+algo+"M"][j]){
+      //	    n_reshapedbm++;
+      //	    reshapingproductm*=MCTagEfficiency(algo+"M",1,ptCorr,eta)*TagScaleFactor(algo+"M", 1, "noSyst", ptCorr,eta)/MCTagEfficiency(algo+"M",pFlavour,ptCorr,eta);
+      //	    }
+      //	    else{
+      //	    reshapingproductm*=(1-MCTagEfficiency(algo+"M",1,ptCorr,eta)*TagScaleFactor(algo+"M", 1, "noSyst", ptCorr,eta))/(1-MCTagEfficiency(algo+"M",pFlavour,ptCorr,eta));
+      //	    }
+      //	    if(vfloats_values[lc+"_Is"+algo+"L"][j]){
+      //	    n_reshapedbl++;
+      //	    reshapingproductl*=MCTagEfficiency(algo+"L",1,ptCorr,eta)*TagScaleFactor(algo+"L", 1, "noSyst", ptCorr,eta)/MCTagEfficiency(algo+"L",pFlavour,ptCorr,eta);
+      //	    }
+      //	    else{
+      //	    reshapingproductl*=(1-MCTagEfficiency(algo+"L",1,ptCorr,eta)*TagScaleFactor(algo+"L", 1, "noSyst", ptCorr,eta))/(1-MCTagEfficiency(algo+"L",pFlavour,ptCorr,eta));
+      //	    }*/
+      //	}
+      //      }
+      //      else{
+      //	cout<< "function simple sf jet "<< j << " "<<calcSimpleSF(algo,"T","noSyst",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta,true)<<endl;
+      //
+      //	reshapingproductt*=calcSimpleSF(algo,"T","noSyst",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta,true);
+      //	reshapingproductm*=calcSimpleSF(algo,"M","noSyst",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta,true);
+      //	reshapingproductl*=calcSimpleSF(algo,"L","noSyst",vfloats_values[lc+"_Is"+algo+"T"][j],pFlavour,ptCorr,eta,true);	
+      //	
+      //	/*	if(vfloats_values[lc+"_Is"+algo+"T"][j]){
+      //	  TagScaleFactor(algo+"T", flavor, "noSyst", ptCorr,eta);
+      //	  cout <<" vanilla "<<  TagScaleFactor(algo+"T", flavor, "noSyst", ptCorr,eta)<<endl;
+      //	}
+      //	else{
+      //	  cout <<" vanilla "<<  (1-MCTagEfficiency(algo+"M",flavor,ptCorr,eta))*TagScaleFactor(algo+"T", flavor, "noSyst", ptCorr,eta)/(1-MCTagEfficiency(algo+"M",flavor,ptCorr,eta))<<endl;
+      //	}
+      //	
+      //	
+      //	if(vfloats_values[lc+"_Is"+algo+"M"][j]){reshapingproductm*=TagScaleFactor(algo+"M", flavor, "noSyst", ptCorr,eta);
+      //	}
+      //	else{reshapingproductt*=(1-csvmeff*TagScaleFactor(algo+"M", flavor, "noSyst", ptCorr,eta));
+      //	}
+      //	
+      //	if(vfloats_values[lc+"_Is"+algo+"L"][j]){reshapingproductt*=TagScaleFactor(algo+"L", flavor, "noSyst", ptCorr,eta);
+      //	}
+      //	else{reshapingproductt*=(1-csvleff*TagScaleFactor(algo+"L", flavor, "noSyst", ptCorr,eta));
+      //	}
+      //	*/
+      //      }
+  }
     
     double sfcsvt = TagScaleFactor(algo+"T", flavor, "noSyst", ptCorr,eta);
-    
     double sfcsvl = TagScaleFactor(algo+"L", flavor, "noSyst", ptCorr,eta);
     double sfcsvm = TagScaleFactor(algo+"M", flavor, "noSyst", ptCorr,eta);
    
@@ -4031,99 +4155,103 @@ void DMAnalysisTreeMaker::setEventBTagSF(string label, string category, string a
   //BTagging part
   //if(doBTagSF){
   if(doBTagSF){
-    
 
+    
     //CSVT
     //0 tags
-    b_weight_csvt_0_tags = b_csvt_0_tags.weight(jsfscsvt, ncsv_tmp_t_tags);  
-    b_weight_csvt_0_tags_mistag_up = b_csvt_0_tags.weight(jsfscsvt_mistag_up, ncsv_tmp_t_tags);  
-    b_weight_csvt_0_tags_mistag_down = b_csvt_0_tags.weight(jsfscsvt_mistag_down, ncsv_tmp_t_tags);  
-    b_weight_csvt_0_tags_b_tag_up = b_csvt_0_tags.weight(jsfscsvt_b_tag_up, ncsv_tmp_t_tags);  
-    b_weight_csvt_0_tags_b_tag_down = b_csvt_0_tags.weight(jsfscsvt_b_tag_down, ncsv_tmp_t_tags);  
+    //reshapingproductt*
+    b_weight_csvt_0_tags = ( doTopDecayReshaping ? reshapingproductt : b_csvt_0_tags.weight(jsfscsvt, ncsv_tmp_t_tags) );  
+    b_weight_csvt_0_tags_mistag_up = ( doTopDecayReshaping ? reshapingproductt_mistag_up : b_csvt_0_tags.weight(jsfscsvt_mistag_up, ncsv_tmp_t_tags) );  
+    b_weight_csvt_0_tags_mistag_down = ( doTopDecayReshaping ? reshapingproductt_mistag_down : b_csvt_0_tags.weight(jsfscsvt_mistag_down, ncsv_tmp_t_tags));  
+    b_weight_csvt_0_tags_b_tag_up = ( doTopDecayReshaping ? reshapingproductt_mistag_up : b_csvt_0_tags.weight(jsfscsvt_b_tag_up, ncsv_tmp_t_tags));  
+    b_weight_csvt_0_tags_b_tag_down = ( doTopDecayReshaping ? reshapingproductt_mistag_down : b_csvt_0_tags.weight(jsfscsvt_b_tag_down, ncsv_tmp_t_tags));  
     
+    bool verb=false;
     //1 tag
-    b_weight_csvt_1_tag = b_csvt_1_tag.weight(jsfscsvt, ncsv_tmp_t_tags);  
-    b_weight_csvt_1_tag_mistag_up = b_csvt_1_tag.weight(jsfscsvt_mistag_up, ncsv_tmp_t_tags);  
-    b_weight_csvt_1_tag_mistag_down = b_csvt_1_tag.weight(jsfscsvt_mistag_down, ncsv_tmp_t_tags);  
-    b_weight_csvt_1_tag_b_tag_up = b_csvt_1_tag.weight(jsfscsvt_b_tag_up, ncsv_tmp_t_tags);  
-    b_weight_csvt_1_tag_b_tag_down = b_csvt_1_tag.weight(jsfscsvt_b_tag_down, ncsv_tmp_t_tags);  
+    //    if(jsfscsvt.size()==3 && (label+category).find("Tight")!=std::string::npos)verb=true;
+    if(jsfscsvt.size()==3 && (category =="Tight") && algo == "CMVA")verb=true;
+    b_weight_csvt_1_tag = ( doTopDecayReshaping ? reshapingproductt : b_csvt_1_tag.weight(jsfscsvt, ncsv_tmp_t_tags,verb) );  
+    b_weight_csvt_1_tag_mistag_up = ( doTopDecayReshaping ? reshapingproductt_mistag_up : b_csvt_1_tag.weight(jsfscsvt_mistag_up, ncsv_tmp_t_tags) );  
+    b_weight_csvt_1_tag_mistag_down = ( doTopDecayReshaping ? reshapingproductt_mistag_down : b_csvt_1_tag.weight(jsfscsvt_mistag_down, ncsv_tmp_t_tags) );  
+    b_weight_csvt_1_tag_b_tag_up = ( doTopDecayReshaping ? reshapingproductt_b_tag_up : b_csvt_1_tag.weight(jsfscsvt_b_tag_up, ncsv_tmp_t_tags) );  
+    b_weight_csvt_1_tag_b_tag_down = ( doTopDecayReshaping ? reshapingproductt_b_tag_down : b_csvt_1_tag.weight(jsfscsvt_b_tag_down, ncsv_tmp_t_tags) );  
     //      cout <<"w1t check: is"<< b_weight_csvt_1_tag<<endl;
     
     //2 tags
-    b_weight_csvt_2_tags = b_csvt_2_tags.weight(jsfscsvt, ncsv_tmp_t_tags);  
-    b_weight_csvt_2_tags_mistag_up = b_csvt_2_tags.weight(jsfscsvt_mistag_up, ncsv_tmp_t_tags);  
-    b_weight_csvt_2_tags_mistag_down = b_csvt_2_tags.weight(jsfscsvt_mistag_down, ncsv_tmp_t_tags);  
-    b_weight_csvt_2_tags_b_tag_up = b_csvt_2_tags.weight(jsfscsvt_b_tag_up, ncsv_tmp_t_tags);  
-    b_weight_csvt_2_tags_b_tag_down = b_csvt_2_tags.weight(jsfscsvt_b_tag_down, ncsv_tmp_t_tags);  
+    b_weight_csvt_2_tags = ( doTopDecayReshaping ? reshapingproductt : b_csvt_2_tags.weight(jsfscsvt, ncsv_tmp_t_tags) );  
+    b_weight_csvt_2_tags_mistag_up = ( doTopDecayReshaping ? reshapingproductt_mistag_up : b_csvt_2_tags.weight(jsfscsvt_mistag_up, ncsv_tmp_t_tags) );  
+    b_weight_csvt_2_tags_mistag_down = ( doTopDecayReshaping ? reshapingproductt_mistag_down : b_csvt_2_tags.weight(jsfscsvt_mistag_down, ncsv_tmp_t_tags) );  
+    b_weight_csvt_2_tags_b_tag_up = ( doTopDecayReshaping ? reshapingproductt_b_tag_up : b_csvt_2_tags.weight(jsfscsvt_b_tag_up, ncsv_tmp_t_tags) );  
+    b_weight_csvt_2_tags_b_tag_down = ( doTopDecayReshaping ? reshapingproductt_b_tag_down : b_csvt_2_tags.weight(jsfscsvt_b_tag_down, ncsv_tmp_t_tags) );  
     
     //1-2 tags
-    b_weight_csvt_1_2_tags = b_csvt_1_2_tags.weight(jsfscsvt, ncsv_tmp_t_tags);  
-    b_weight_csvt_1_2_tags_b_tag_up = b_csvt_1_2_tags.weight(jsfscsvt_b_tag_up, ncsv_tmp_t_tags);  
-    b_weight_csvt_1_2_tags_b_tag_down = b_csvt_1_2_tags.weight(jsfscsvt_b_tag_down, ncsv_tmp_t_tags);  
-    b_weight_csvt_1_2_tags_mistag_up = b_csvt_1_2_tags.weight(jsfscsvt_mistag_up, ncsv_tmp_t_tags);  
-    b_weight_csvt_1_2_tags_mistag_down = b_csvt_1_2_tags.weight(jsfscsvt_mistag_down, ncsv_tmp_t_tags);  
+    b_weight_csvt_1_2_tags = ( doTopDecayReshaping ? reshapingproductt : b_csvt_1_2_tags.weight(jsfscsvt, ncsv_tmp_t_tags) );  
+    b_weight_csvt_1_2_tags_b_tag_up = ( doTopDecayReshaping ? reshapingproductt_mistag_up : b_csvt_1_2_tags.weight(jsfscsvt_b_tag_up, ncsv_tmp_t_tags) );  
+    b_weight_csvt_1_2_tags_b_tag_down = ( doTopDecayReshaping ? reshapingproductt_mistag_down : b_csvt_1_2_tags.weight(jsfscsvt_b_tag_down, ncsv_tmp_t_tags) );  
+    b_weight_csvt_1_2_tags_mistag_up = ( doTopDecayReshaping ? reshapingproductt_b_tag_up : b_csvt_1_2_tags.weight(jsfscsvt_mistag_up, ncsv_tmp_t_tags) );  
+    b_weight_csvt_1_2_tags_mistag_down = ( doTopDecayReshaping ? reshapingproductt_b_tag_down : b_csvt_1_2_tags.weight(jsfscsvt_mistag_down, ncsv_tmp_t_tags) );  
     
     
     //CSVM
     //0 tags
-    b_weight_csvm_0_tags = b_csvm_0_tags.weight(jsfscsvm, ncsv_tmp_m_tags);  
-    b_weight_csvm_0_tags_mistag_up = b_csvm_0_tags.weight(jsfscsvm_mistag_up, ncsv_tmp_m_tags);  
-    b_weight_csvm_0_tags_mistag_down = b_csvm_0_tags.weight(jsfscsvm_mistag_down, ncsv_tmp_m_tags);  
-    b_weight_csvm_0_tags_b_tag_up = b_csvm_0_tags.weight(jsfscsvm_b_tag_up, ncsv_tmp_m_tags);  
-    b_weight_csvm_0_tags_b_tag_down = b_csvm_0_tags.weight(jsfscsvm_b_tag_down, ncsv_tmp_m_tags);  
+    b_weight_csvm_0_tags = ( doTopDecayReshaping ? reshapingproductm : b_csvm_0_tags.weight(jsfscsvm, ncsv_tmp_m_tags) );  
+    b_weight_csvm_0_tags_mistag_up = ( doTopDecayReshaping ? reshapingproductm_mistag_up : b_csvm_0_tags.weight(jsfscsvm_mistag_up, ncsv_tmp_m_tags) );  
+    b_weight_csvm_0_tags_mistag_down = ( doTopDecayReshaping ? reshapingproductm_mistag_down : b_csvm_0_tags.weight(jsfscsvm_mistag_down, ncsv_tmp_m_tags) );  
+    b_weight_csvm_0_tags_b_tag_up = ( doTopDecayReshaping ? reshapingproductm_b_tag_up : b_csvm_0_tags.weight(jsfscsvm_b_tag_up, ncsv_tmp_m_tags) );  
+    b_weight_csvm_0_tags_b_tag_down = ( doTopDecayReshaping ? reshapingproductm_b_tag_down : b_csvm_0_tags.weight(jsfscsvm_b_tag_down, ncsv_tmp_m_tags) );  
     
     //1 tag
-    b_weight_csvm_1_tag = b_csvm_1_tag.weight(jsfscsvm, ncsv_tmp_m_tags);  
-    b_weight_csvm_1_tag_mistag_up = b_csvm_1_tag.weight(jsfscsvm_mistag_up, ncsv_tmp_m_tags);  
-    b_weight_csvm_1_tag_mistag_down = b_csvm_1_tag.weight(jsfscsvm_mistag_down, ncsv_tmp_m_tags);  
-    b_weight_csvm_1_tag_b_tag_up = b_csvm_1_tag.weight(jsfscsvm_b_tag_up, ncsv_tmp_m_tags);  
-    b_weight_csvm_1_tag_b_tag_down = b_csvm_1_tag.weight(jsfscsvm_b_tag_down, ncsv_tmp_m_tags);  
+    b_weight_csvm_1_tag = ( doTopDecayReshaping ? reshapingproductm : b_csvm_1_tag.weight(jsfscsvm, ncsv_tmp_m_tags) );  
+    b_weight_csvm_1_tag_mistag_up = ( doTopDecayReshaping ? reshapingproductm_mistag_up : b_csvm_1_tag.weight(jsfscsvm_mistag_up, ncsv_tmp_m_tags) );  
+    b_weight_csvm_1_tag_mistag_down = ( doTopDecayReshaping ? reshapingproductm_mistag_down : b_csvm_1_tag.weight(jsfscsvm_mistag_down, ncsv_tmp_m_tags) );  
+    b_weight_csvm_1_tag_b_tag_up = ( doTopDecayReshaping ? reshapingproductm_b_tag_up : b_csvm_1_tag.weight(jsfscsvm_b_tag_up, ncsv_tmp_m_tags) );  
+    b_weight_csvm_1_tag_b_tag_down = ( doTopDecayReshaping ? reshapingproductm_b_tag_down : b_csvm_1_tag.weight(jsfscsvm_b_tag_down, ncsv_tmp_m_tags) );  
     //      cout <<"w1t check: is"<< b_weight_csvm_1_tag<<endl;
     
     //2 tags
-    b_weight_csvm_2_tags = b_csvm_2_tags.weight(jsfscsvm, ncsv_tmp_m_tags);  
-    b_weight_csvm_2_tags_mistag_up = b_csvm_2_tags.weight(jsfscsvm_mistag_up, ncsv_tmp_m_tags);  
-    b_weight_csvm_2_tags_mistag_down = b_csvm_2_tags.weight(jsfscsvm_mistag_down, ncsv_tmp_m_tags);  
-    b_weight_csvm_2_tags_b_tag_up = b_csvm_2_tags.weight(jsfscsvm_b_tag_up, ncsv_tmp_m_tags);  
-    b_weight_csvm_2_tags_b_tag_down = b_csvm_2_tags.weight(jsfscsvm_b_tag_down, ncsv_tmp_m_tags);  
+    b_weight_csvm_2_tags = ( doTopDecayReshaping ? reshapingproductm : b_csvm_2_tags.weight(jsfscsvm, ncsv_tmp_m_tags) );  
+    b_weight_csvm_2_tags_mistag_up = ( doTopDecayReshaping ? reshapingproductm_mistag_up : b_csvm_2_tags.weight(jsfscsvm_mistag_up, ncsv_tmp_m_tags) );  
+    b_weight_csvm_2_tags_mistag_down = ( doTopDecayReshaping ? reshapingproductm_mistag_down : b_csvm_2_tags.weight(jsfscsvm_mistag_down, ncsv_tmp_m_tags) );  
+    b_weight_csvm_2_tags_b_tag_up = ( doTopDecayReshaping ? reshapingproductm_b_tag_up : b_csvm_2_tags.weight(jsfscsvm_b_tag_up, ncsv_tmp_m_tags) );  
+    b_weight_csvm_2_tags_b_tag_down = ( doTopDecayReshaping ? reshapingproductm_b_tag_down : b_csvm_2_tags.weight(jsfscsvm_b_tag_down, ncsv_tmp_m_tags) );  
     
     //1-2 tags
-    b_weight_csvm_1_2_tags = b_csvm_1_2_tags.weight(jsfscsvm, ncsv_tmp_m_tags);  
-    b_weight_csvm_1_2_tags_b_tag_up = b_csvm_1_2_tags.weight(jsfscsvm_b_tag_up, ncsv_tmp_m_tags);  
-    b_weight_csvm_1_2_tags_b_tag_down = b_csvm_1_2_tags.weight(jsfscsvm_b_tag_down, ncsv_tmp_m_tags);  
-    b_weight_csvm_1_2_tags_mistag_up = b_csvm_1_2_tags.weight(jsfscsvm_mistag_up, ncsv_tmp_m_tags);  
-    b_weight_csvm_1_2_tags_mistag_down = b_csvm_1_2_tags.weight(jsfscsvm_mistag_down, ncsv_tmp_m_tags);  
+    b_weight_csvm_1_2_tags = ( doTopDecayReshaping ? reshapingproductm : b_csvm_1_2_tags.weight(jsfscsvm, ncsv_tmp_m_tags) );  
+    b_weight_csvm_1_2_tags_b_tag_up = ( doTopDecayReshaping ? reshapingproductm_mistag_up : b_csvm_1_2_tags.weight(jsfscsvm_b_tag_up, ncsv_tmp_m_tags) );  
+    b_weight_csvm_1_2_tags_b_tag_down = ( doTopDecayReshaping ? reshapingproductm_mistag_down : b_csvm_1_2_tags.weight(jsfscsvm_b_tag_down, ncsv_tmp_m_tags) );  
+    b_weight_csvm_1_2_tags_mistag_up = ( doTopDecayReshaping ? reshapingproductm_b_tag_up : b_csvm_1_2_tags.weight(jsfscsvm_mistag_up, ncsv_tmp_m_tags) );  
+    b_weight_csvm_1_2_tags_mistag_down = ( doTopDecayReshaping ? reshapingproductm_b_tag_down : b_csvm_1_2_tags.weight(jsfscsvm_mistag_down, ncsv_tmp_m_tags) );  
     
     
     //CSVL
     //0 tags
-    b_weight_csvl_0_tags = b_csvl_0_tags.weight(jsfscsvl, ncsv_tmp_l_tags);  
-    b_weight_csvl_0_tags_mistag_up = b_csvl_0_tags.weight(jsfscsvl_mistag_up, ncsv_tmp_l_tags);  
-    b_weight_csvl_0_tags_mistag_down = b_csvl_0_tags.weight(jsfscsvl_mistag_down, ncsv_tmp_l_tags);  
-    b_weight_csvl_0_tags_b_tag_up = b_csvl_0_tags.weight(jsfscsvl_b_tag_up, ncsv_tmp_l_tags);  
-    b_weight_csvl_0_tags_b_tag_down = b_csvl_0_tags.weight(jsfscsvl_b_tag_down, ncsv_tmp_l_tags);  
+    b_weight_csvl_0_tags = ( doTopDecayReshaping ? reshapingproductl : b_csvl_0_tags.weight(jsfscsvl, ncsv_tmp_l_tags) );  
+    b_weight_csvl_0_tags_mistag_up = ( doTopDecayReshaping ? reshapingproductl_mistag_up : b_csvl_0_tags.weight(jsfscsvl_mistag_up, ncsv_tmp_l_tags) );  
+    b_weight_csvl_0_tags_mistag_down = ( doTopDecayReshaping ? reshapingproductl_mistag_down : b_csvl_0_tags.weight(jsfscsvl_mistag_down, ncsv_tmp_l_tags) );  
+    b_weight_csvl_0_tags_b_tag_up = ( doTopDecayReshaping ? reshapingproductl_b_tag_up : b_csvl_0_tags.weight(jsfscsvl_b_tag_up, ncsv_tmp_l_tags) );  
+    b_weight_csvl_0_tags_b_tag_down = ( doTopDecayReshaping ? reshapingproductl_b_tag_down : b_csvl_0_tags.weight(jsfscsvl_b_tag_down, ncsv_tmp_l_tags) );  
     
     //1 tag
-    b_weight_csvl_1_tag = b_csvl_1_tag.weight(jsfscsvl, ncsv_tmp_l_tags);  
-    b_weight_csvl_1_tag_mistag_up = b_csvl_1_tag.weight(jsfscsvl_mistag_up, ncsv_tmp_l_tags);  
-    b_weight_csvl_1_tag_mistag_down = b_csvl_1_tag.weight(jsfscsvl_mistag_down, ncsv_tmp_l_tags);  
-    b_weight_csvl_1_tag_b_tag_up = b_csvl_1_tag.weight(jsfscsvl_b_tag_up, ncsv_tmp_l_tags);  
-    b_weight_csvl_1_tag_b_tag_down = b_csvl_1_tag.weight(jsfscsvl_b_tag_down, ncsv_tmp_l_tags);  
+    b_weight_csvl_1_tag = ( doTopDecayReshaping ? reshapingproductl : b_csvl_1_tag.weight(jsfscsvl, ncsv_tmp_l_tags) );  
+    b_weight_csvl_1_tag_mistag_up = ( doTopDecayReshaping ? reshapingproductl_mistag_up : b_csvl_1_tag.weight(jsfscsvl_mistag_up, ncsv_tmp_l_tags) );  
+    b_weight_csvl_1_tag_mistag_down = ( doTopDecayReshaping ? reshapingproductl_mistag_down : b_csvl_1_tag.weight(jsfscsvl_mistag_down, ncsv_tmp_l_tags) );  
+    b_weight_csvl_1_tag_b_tag_up = ( doTopDecayReshaping ? reshapingproductl_b_tag_up : b_csvl_1_tag.weight(jsfscsvl_b_tag_up, ncsv_tmp_l_tags) );  
+    b_weight_csvl_1_tag_b_tag_down = ( doTopDecayReshaping ? reshapingproductl_b_tag_down : b_csvl_1_tag.weight(jsfscsvl_b_tag_down, ncsv_tmp_l_tags) );  
     //      cout <<"w1t check: is"<< b_weight_csvl_1_tag<<endl;
     
     //2 tags
-    b_weight_csvl_2_tags = b_csvl_2_tags.weight(jsfscsvl, ncsv_tmp_l_tags);  
-    b_weight_csvl_2_tags_mistag_up = b_csvl_2_tags.weight(jsfscsvl_mistag_up, ncsv_tmp_l_tags);  
-    b_weight_csvl_2_tags_mistag_down = b_csvl_2_tags.weight(jsfscsvl_mistag_down, ncsv_tmp_l_tags);  
-    b_weight_csvl_2_tags_b_tag_up = b_csvl_2_tags.weight(jsfscsvl_b_tag_up, ncsv_tmp_l_tags);  
-    b_weight_csvl_2_tags_b_tag_down = b_csvl_2_tags.weight(jsfscsvl_b_tag_down, ncsv_tmp_l_tags);  
+    b_weight_csvl_2_tags = ( doTopDecayReshaping ? reshapingproductl : b_csvl_2_tags.weight(jsfscsvl, ncsv_tmp_l_tags) );  
+    b_weight_csvl_2_tags_mistag_up = ( doTopDecayReshaping ? reshapingproductl_mistag_up : b_csvl_2_tags.weight(jsfscsvl_mistag_up, ncsv_tmp_l_tags) );  
+    b_weight_csvl_2_tags_mistag_down = ( doTopDecayReshaping ? reshapingproductl_mistag_down : b_csvl_2_tags.weight(jsfscsvl_mistag_down, ncsv_tmp_l_tags) );  
+    b_weight_csvl_2_tags_b_tag_up = ( doTopDecayReshaping ? reshapingproductl_b_tag_up : b_csvl_2_tags.weight(jsfscsvl_b_tag_up, ncsv_tmp_l_tags) );  
+    b_weight_csvl_2_tags_b_tag_down = ( doTopDecayReshaping ? reshapingproductl_b_tag_down : b_csvl_2_tags.weight(jsfscsvl_b_tag_down, ncsv_tmp_l_tags) );  
     
     //1-2 tags
-    b_weight_csvl_1_2_tags = b_csvl_1_2_tags.weight(jsfscsvl, ncsv_tmp_l_tags);  
-    b_weight_csvl_1_2_tags_b_tag_up = b_csvl_1_2_tags.weight(jsfscsvl_b_tag_up, ncsv_tmp_l_tags);  
-    b_weight_csvl_1_2_tags_b_tag_down = b_csvl_1_2_tags.weight(jsfscsvl_b_tag_down, ncsv_tmp_l_tags);  
-    b_weight_csvl_1_2_tags_mistag_up = b_csvl_1_2_tags.weight(jsfscsvl_mistag_up, ncsv_tmp_l_tags);  
-    b_weight_csvl_1_2_tags_mistag_down = b_csvl_1_2_tags.weight(jsfscsvl_mistag_down, ncsv_tmp_l_tags);  
+    b_weight_csvl_1_2_tags = ( doTopDecayReshaping ? reshapingproductl : b_csvl_1_2_tags.weight(jsfscsvl, ncsv_tmp_l_tags) );  
+    b_weight_csvl_1_2_tags_b_tag_up = ( doTopDecayReshaping ? reshapingproductl_mistag_up : b_csvl_1_2_tags.weight(jsfscsvl_b_tag_up, ncsv_tmp_l_tags) );  
+    b_weight_csvl_1_2_tags_b_tag_down = ( doTopDecayReshaping ? reshapingproductl_mistag_down : b_csvl_1_2_tags.weight(jsfscsvl_b_tag_down, ncsv_tmp_l_tags) );  
+    b_weight_csvl_1_2_tags_mistag_up = ( doTopDecayReshaping ? reshapingproductl_b_tag_up : b_csvl_1_2_tags.weight(jsfscsvl_mistag_up, ncsv_tmp_l_tags) );  
+    b_weight_csvl_1_2_tags_mistag_down = ( doTopDecayReshaping ? reshapingproductl_b_tag_down : b_csvl_1_2_tags.weight(jsfscsvl_mistag_down, ncsv_tmp_l_tags) );  
     
     //    cout << " n tight tags "<< ncsv_tmp_l_tags  << " w0tag "<< b_weight_csvl_0_tags<<" w1tag " << b_weight_csvl_1_tag <<" w2tags "<<b_weight_csvt_2_tags  <<endl;
 
@@ -4224,6 +4352,26 @@ void DMAnalysisTreeMaker::initializePdf(string central, string varied){
     if(varied == "NNPDF") { LHAPDF::initPDFSet(2, "NNPDF21_100.LHgrid");  maxPdf = 100; }
     if(varied == "MSTW") { LHAPDF::initPDFSet(2, "MSTW2008nlo68cl.LHgrid"); maxPdf = 40; }
 
+}
+
+double DMAnalysisTreeMaker::calcSimpleSF(string algo, string wp, string syst, bool passes , double pFlavour, double ptCorr, double eta, bool noreshape){
+  //cout<< "function simple sf jet "<< j << calcSimpleSF(algo,"T","noSyst",pFlavour,vfloats_values[lc+"_Is"+algo+"T"][j],ptCorr,eta)<<endl;
+  //cout<< " vanilla "<< (MCTagEfficiency(algo+"T",1,ptCorr,eta)/MCTagEfficiency(algo+"T",pFlavour,ptCorr,eta))*TagScaleFactor(algo+"T", 1, "noSyst", ptCorr,eta)<<endl;
+  double simplesf=-1.0;
+  //cout << "noreshape is "<<noreshape<<endl;
+  if(!noreshape){
+    //cout << " algo "<< algo <<" wp "<< wp << " passes "<<bool(passes)<< " syst "<< syst << " flav "<< pFlavour << " ptcorr "<<ptCorr << " eta "<<eta<<" === "; 
+    simplesf =( bool(passes) ? (MCTagEfficiency(algo+wp,1,ptCorr,eta)/MCTagEfficiency(algo+wp,pFlavour,ptCorr,eta))*TagScaleFactor(algo+wp, 1, syst, ptCorr,eta) : (1-MCTagEfficiency(algo+wp,1,ptCorr,eta)*TagScaleFactor(algo+wp, 1, syst, ptCorr,eta))/(1-MCTagEfficiency(algo+wp,pFlavour,ptCorr,eta)));
+    //    cout << " === inline simple sf "<<simplesf <<" === "<<endl;
+    
+  }
+  if (noreshape) {
+    //    cout <<"bug"<<endl;
+    //cout << " algo "<< algo <<" wp "<< wp << " passes "<<bool(passes)<< " syst "<< syst << " flav "<< pFlavour << " ptcorr "<<ptCorr << " eta "<<eta<<" === "; 
+    simplesf = (bool(passes) ? TagScaleFactor(algo+"T", pFlavour, "noSyst", ptCorr,eta) : (1-MCTagEfficiency(algo+wp,pFlavour,ptCorr,eta)*TagScaleFactor(algo+"T", pFlavour, "noSyst", ptCorr,eta))/(1-MCTagEfficiency(algo+wp,pFlavour,ptCorr,eta)));
+    //cout << " === inline simple sf "<<simplesf <<" === "<<endl;
+  }
+  return simplesf;
 }
 
 double DMAnalysisTreeMaker::getWEWKPtWeight(double ptW){
@@ -4652,8 +4800,10 @@ bool DMAnalysisTreeMaker::BTagWeight::filter(int t)
     return (t >= minTags && t <= maxTags);
 }
 
-float DMAnalysisTreeMaker::BTagWeight::weight(vector<JetInfo> jetTags, int tags)
+float DMAnalysisTreeMaker::BTagWeight::weight(vector<JetInfo> jetTags, int tags, bool verbose)
 {
+
+  if(verbose)cout << "  doing b weight verbose mode ====== "<<" jetTags "<< jetTags.size() << " tags "<<tags <<endl;
     if (!filter(tags))
     {
         //   std::cout << "nThis event should not pass the selection, what is it doing here?" << std::endl;
@@ -4665,11 +4815,11 @@ float DMAnalysisTreeMaker::BTagWeight::weight(vector<JetInfo> jetTags, int tags)
     float pMC = 0;
     float pData = 0;
     for (int i = 0; i < comb; i++)
-    {
+      {
         float mc = 1.;
         float data = 1.;
         int ntagged = 0;
-        for (int j = 0; j < njetTags; j++)
+	for (int j = 0; j < njetTags; j++)
         {
             bool tagged = ((i >> j) & 0x1) == 1;
             if (tagged)
@@ -4677,20 +4827,26 @@ float DMAnalysisTreeMaker::BTagWeight::weight(vector<JetInfo> jetTags, int tags)
                 ntagged++;
                 mc *= jetTags[j].eff;
                 data *= jetTags[j].eff * jetTags[j].sf;
+		if(verbose)cout << " comb "<< i <<  " j "<< j << " tagged " << " data "<<jetTags[j].eff * jetTags[j].sf << " mc "<< jetTags[j].eff << endl;
+			     
             }
             else
             {
                 mc *= (1. - jetTags[j].eff);
                 data *= (1. - jetTags[j].eff * jetTags[j].sf);
+		if(verbose)cout << " comb "<< i <<  " j "<< j << " nontagged " << " data "<<jetTags[j].eff * jetTags[j].sf << " mc "<< jetTags[j].eff <<endl;
             }
-        }
+	}
 
+	
         if (filter(ntagged))
         {
 	  //	  std::cout << mc << " " << data << endl;
             pMC += mc;
             pData += data;
         }
+	if(verbose)cout << " comb "<< i <<" pData "<< data<<  " pMC " << mc<<"   | pData "<< pData<< "    | pMC " <<pMC<< endl;
+	    
     }
 
     if (pMC == 0) return 0;

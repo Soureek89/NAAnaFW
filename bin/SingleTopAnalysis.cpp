@@ -363,8 +363,9 @@ int main(int argc, char **argv) {
 
     if(sample.find("_sd")!=std::string::npos){
       //      doTtoSDDecay=true;
-      doTtoSDDecay=false;
-      
+      if(sample.find("_reshape")!=std::string::npos){
+	doTtoSDDecay=false;
+      }      
     }
     //addPDF=false;
 
@@ -1490,6 +1491,12 @@ int main(int argc, char **argv) {
   TFile* file_sf_elec = TFile::Open("data/HLT_Ele32_eta2p1_WPTight_Gsf_FullRunRange.root");
   Weights elTightEff_BCDEFGH(file_sf_elec, "SF");
 
+  TFile* file_sf_elec_reco = TFile::Open("data/egammaEffi_Reco_EGM2D.root");
+  Weights elTightEff_Reco_BCDEFGH(file_sf_elec_reco, "EGamma_SF2D");
+
+  TFile* file_sf_elec_id = TFile::Open("data/egammaEffi_ID_EGM2D.root");
+  Weights elTightEff_ID_BCDEFGH(file_sf_elec_id, "EGamma_SF2D");
+
 
 
   //New-SF files
@@ -1526,7 +1533,8 @@ int main(int argc, char **argv) {
         LumiWeightsDown_ = edm::LumiReWeighting("pu/MCPU.root", "pu/MyDataPileupHistogram_down.root","pileup","pileup");
         }
   
-    for(Int_t evt=0; evt<nEvents; evt++ ){
+    //    for(Int_t evt=0; evt<nEvents; evt++ ){
+    for(Int_t evt=0; evt<20000; evt++ ){
         if(evt%1000==1 ){
 	  time_t ctt = time(0);
 	  cout<<"Info: Running on event: "<<evt<< " time "<< asctime(localtime(&ctt))<<endl; 
@@ -1748,10 +1756,17 @@ int main(int argc, char **argv) {
       }
       
       if(tightEl.size()==1){
-        lepWeightBCDEFGH1El = elTightEff_BCDEFGH.getEff(fabs(tightEl.at(0).Eta()),tightEl.at(0).Pt());
-        lepWeight1Ele = lepWeightBCDEFGH1El;
-        
-        float errEl = elTightEff_BCDEFGH.getErr(fabs(tightEl.at(0).Eta()),tightEl.at(0).Pt());
+        lepWeightBCDEFGH1El = elTightEff_BCDEFGH.getEff(fabs(tightEl.at(0).Eta()),tightEl.at(0).Pt()) * elTightEff_Reco_BCDEFGH.getEff(fabs(tightEl.at(0).Eta()),tightEl.at(0).Pt()) *elTightEff_ID_BCDEFGH.getEff(fabs(tightEl.at(0).Eta()),tightEl.at(0).Pt());
+                
+        float errEl =  sqrt( pow(elTightEff_BCDEFGH.getErr(fabs(tightEl.at(0).Eta()),tightEl.at(0).Pt()),2) + 
+		pow(elTightEff_Reco_BCDEFGH.getErr(fabs(tightEl.at(0).Eta()),tightEl.at(0).Pt()),2)+ 
+		pow(elTightEff_ID_BCDEFGH.getErr(fabs(tightEl.at(0).Eta()),tightEl.at(0).Pt()),2) );
+
+	lepWeightBCDEFGH1El = elTightEff_BCDEFGH.getEff(fabs(tightEl.at(0).Eta()),tightEl.at(0).Pt());
+        errEl =  sqrt( pow(elTightEff_BCDEFGH.getErr(fabs(tightEl.at(0).Eta()),tightEl.at(0).Pt()),2) );
+
+	lepWeight1Ele = lepWeightBCDEFGH1El;
+	
         lepWeight1EleLepUp = lepWeight1Ele + errEl;
         lepWeight1EleLepDown = lepWeight1Ele - errEl;
         //cout <<"lepNominal :"<<lepWeightBCDEFGH1El<<": lep Up "<<lepWeight1EleLepUp<<": lep Down "<<lepWeight1EleLepDown<<endl;

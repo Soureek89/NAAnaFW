@@ -52,7 +52,7 @@ scanJet = ["CorrPt_20"]
 
 sysMu = [""]
 sysEl = [""]
-sysJet = ["JESUp","JESDown"]
+sysJet = ["JESUp","JESDown","JERUp","JERDown"]
 
 #scanJet = ["CorrPt_30"]
 #scanJet = ["Pt_30","Pt_40"]

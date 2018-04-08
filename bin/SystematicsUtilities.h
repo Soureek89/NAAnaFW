@@ -47,6 +47,10 @@ struct systWeights{
   void setWCats(double *wcats);
   void setSelectionsNames(string * selections);
   
+  //Utilities to add specific systs:
+  //void addSFSyst(string name,float nominal,  float systup, float systdown, bool mult=true);
+  
+
   //Selections
   void addSelection(string name);
 
@@ -269,7 +273,6 @@ void writeHistogramsSysts(TH1F* histo[(int)MAXSYSTS], TFile *filesout[(int)MAXSY
     //    histo[sy]=new TH1F(name+ns,name+ns,nbins,min,max);
   }
 }
-
 
 void systWeights:: addHistograms(TH1F** histo, TH1F ** histoweights){
 int MAX= this->maxSystsNonPDF;
@@ -502,6 +505,32 @@ void systWeights::addSystNonPDF(string name){
   }
   this->setMax(maxSystsNonPDF+nPDF);
   this->weightedNames[this->maxSysts]= "";
+}
+
+
+void systWeights::addkFact(string name){
+  this->addSystNonPDF(name+"Up");
+  this->addSystNonPDF(name+"Down");
+}    
+
+
+void systWeights::setkFact(string name,float kfact_nom, float kfact_up,float kfact_down,  bool mult){
+  float zerofact=1.0;
+  if(mult){
+    zerofact=this->weightedSysts[0];
+    //    cout <<  "zerofact "<< zerofact << endl;
+  }
+  if( kfact_nom!=0){
+    //cout << " syst "<< name <<"zerofact "<< zerofact << " up weight "<< kfact_up/kfact_nom<< " down weight " << kfact_up/kfact_nom  << " tot to fill "<< zerofact*kfact_up/kfact_nom<<  " down"<<zerofact*kfact_down/kfact_nom<<endl;
+    this->setSystValue(name+"Up", zerofact*kfact_up/kfact_nom);
+    this->setSystValue(name+"Down", zerofact*kfact_down/kfact_nom);
+  }  
+  else {
+    //    cout << " syst "<< name <<"zerofact "<< zerofact << " kfact nom 0 putting to 1"<<endl;
+    //    cout << " warning! kfact nominal for syst "<< name <<" 0! putting all to zero "<<endl;
+    this->setSystValue(name+"Up", 1);
+    this->setSystValue(name+"Down", 1);
+  }
 }
 
 void systWeights::addEventBasedSyst(string name){

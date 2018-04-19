@@ -1858,7 +1858,7 @@ int main(int argc, char **argv) {
 	//TrigGSFEl32=true;
         if (channel == "electron" || channel == "electronantiiso") TrigGSFEl32 = slHLTEle32_eta2p1_WPTight_Gsf_v1||slHLTEle32_eta2p1_WPTight_Gsf_v2||slHLTEle32_eta2p1_WPTight_Gsf_v3||slHLTEle32_eta2p1_WPTight_Gsf_v4||slHLTEle32_eta2p1_WPTight_Gsf_v5||slHLTEle32_eta2p1_WPTight_Gsf_v6||slHLTEle32_eta2p1_WPTight_Gsf_v7||slHLTEle32_eta2p1_WPTight_Gsf_v8||slHLTEle32_eta2p1_WPTight_Gsf_v9;
 	//	TrigGSFEl32=true;
-	if (/*doSynch  || */channel == "muonantiiso"){
+	if (doSynch  || channel == "muonantiiso"){
 	  // TrigIsoMu24=false;
 	  //#	  TrigGSFEl32=false;
 	  //TrigIsoMu24 = true; 

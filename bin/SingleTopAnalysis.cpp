@@ -1820,8 +1820,8 @@ int main(int argc, char **argv) {
         LumiWeightsDown_ = edm::LumiReWeighting("pu/MCPU.root", "pu/MyDataPileupHistogram_down.root","pileup","pileup");
         }
   
-    //    for(Int_t evt=0; evt<nEvents; evt++ ){
-    for(Int_t evt=0; evt<20000; evt++ ){
+    for(Int_t evt=0; evt<nEvents; evt++ ){
+      //for(Int_t evt=0; evt<20000; evt++ ){
         if(evt%1000==1 ){
 	  time_t ctt = time(0);
 	  cout<<"Info: Running on event: "<<evt<< " time "<< asctime(localtime(&ctt))<<endl; 
@@ -1858,7 +1858,7 @@ int main(int argc, char **argv) {
 	//TrigGSFEl32=true;
         if (channel == "electron" || channel == "electronantiiso") TrigGSFEl32 = slHLTEle32_eta2p1_WPTight_Gsf_v1||slHLTEle32_eta2p1_WPTight_Gsf_v2||slHLTEle32_eta2p1_WPTight_Gsf_v3||slHLTEle32_eta2p1_WPTight_Gsf_v4||slHLTEle32_eta2p1_WPTight_Gsf_v5||slHLTEle32_eta2p1_WPTight_Gsf_v6||slHLTEle32_eta2p1_WPTight_Gsf_v7||slHLTEle32_eta2p1_WPTight_Gsf_v8||slHLTEle32_eta2p1_WPTight_Gsf_v9;
 	//	TrigGSFEl32=true;
-	if (doSynch  || channel == "muonantiiso"){
+	if (/*doSynch  || */channel == "muonantiiso"){
 	  // TrigIsoMu24=false;
 	  //#	  TrigGSFEl32=false;
 	  //TrigIsoMu24 = true; 

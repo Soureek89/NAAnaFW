@@ -6,7 +6,7 @@ import subprocess
 import sys
 import glob
 import commands
-from utils import *
+#from utils import *
 #import colorama
 #from colorama import Fore, Back, Style
 #text = "The quick brown fox jumps over the lazy dog"
@@ -37,11 +37,14 @@ parser.add_option('-n', '--dryrun',   dest='dryrun',  action='store_true', defau
 #define samples, one folder for each mass value
 namesAndCfgs = {}  
 discriminants=[]
-discriminants.append("ST_vs_TT")
-discriminants.append("ST_vs_VJ")
+#discriminants.append("ST_vs_TT")
+#discriminants.append("ST_vs_VJ")
+#discriminants.append("STsd_vs_VJ")
+#discriminants.append("STsd_vs_TT")
+#discriminants.append("STsd_vs_ST")
 discriminants.append("STsd_vs_VJ")
-discriminants.append("STsd_vs_TT")
-discriminants.append("STsd_vs_ST")
+#discriminants.append("STsd_vs_ST_test")
 for d in discriminants:
     namesAndCfgs[d]="cfg"+d+".txt"
     os.system("root -l -b -q 'trainTMVA.C(\""+d+"\",\""+namesAndCfgs[d]+"\")' >& train"+d+".log &")
+    #os.system("root -l 'trainTMVA.C(\""+d+"\",\""+namesAndCfgs[d]+"\")' >& train"+d+".log &")

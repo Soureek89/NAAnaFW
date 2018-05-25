@@ -9,18 +9,41 @@
 from utils import *
 
 
-WJetsToLNu = sample()
-WJetsToLNu.files = outlist (d,"WJetsToLNu")
-WJetsToLNu.skimEff = 1.
-#WJetsToLNu.sigma = 23.1363
-WJetsToLNu.sigma =  (11811.4+ 8677.3)*3.
-WJetsToLNu.jpref = jetLabel 
-WJetsToLNu.jp = jetLabel
-WJetsToLNu.color = ROOT.kGreen+2
-WJetsToLNu.style = 1
-WJetsToLNu.fill = 1001
-WJetsToLNu.leglabel = "WJets"
-WJetsToLNu.label = "WJetsToLNu"
+WToLNu0J = sample()
+WToLNu0J.files = outlist (d,"WToLNu0J")
+WToLNu0J.skimEff = 1.
+WToLNu0J.sigma =  49670.
+WToLNu0J.jpref = jetLabel 
+WToLNu0J.jp = jetLabel
+WToLNu0J.color = ROOT.kGreen+2
+WToLNu0J.style = 1
+WToLNu0J.fill = 1001
+WToLNu0J.leglabel = "WJets"
+WToLNu0J.label = "WToLNu0J"
+
+WToLNu1J = sample()
+WToLNu1J.files = outlist (d,"WToLNu1J")
+WToLNu1J.skimEff = 1.
+WToLNu1J.sigma =  8264.
+WToLNu1J.jpref = jetLabel 
+WToLNu1J.jp = jetLabel
+WToLNu1J.color = ROOT.kGreen+2
+WToLNu1J.style = 1
+WToLNu1J.fill = 1001
+WToLNu1J.leglabel = "WJets"
+WToLNu1J.label = "WToLNu1J"
+
+WToLNu2J = sample()
+WToLNu2J.files = outlist (d,"WToLNu2J")
+WToLNu2J.skimEff = 1.
+WToLNu2J.sigma =  2544.
+WToLNu2J.jpref = jetLabel 
+WToLNu2J.jp = jetLabel
+WToLNu2J.color = ROOT.kGreen+2
+WToLNu2J.style = 1
+WToLNu2J.fill = 1001
+WToLNu2J.leglabel = "WJets"
+WToLNu2J.label = "WToLNu2J"
 
 DYJetsToLL = sample()
 DYJetsToLL.files = outlist (d,"DYJetsToLL")
@@ -42,7 +65,7 @@ WJets.style = 1
 WJets.fill = 1001
 WJets.leglabel = "W + Jets"
 WJets.label = "WJets"
-WJets.components = [WJetsToLNu]
+WJets.components = [WToLNu0J,WToLNu1J,WToLNu2J]
 #WJets.components = [WJets_HT100_200, WJets_HT200_400, WJets_HT400_600, WJets_HT600_800, WJets_HT800_1200, WJets_HT1200_2500, WJets_HT2500_Inf]
 # WJets.components = [WJets_HT100_200, WJets_HT200_400,  WJets_HT800_1200, WJets_HT1200_2500 ]
 

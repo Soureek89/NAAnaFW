@@ -18,6 +18,7 @@ from utils import *
 #Usage: python new_singletop.py -c muonantiiso -s noSys -m local -P _test -l mc
 #Usage: python new_singletop.py --t3batch -f files/final/ -P SingleMuon -d DATA -S 40 -c munonantiiso
 #Usage: python new_singletop.py -c muonantiiso -s noSys --t3batch -f files/final/ -P SingleMuon -d DATA -S 40 -t trees
+#python new_singletop.py -m tmpcp --tmpdir "/tmp/wajid" -f files/pisa/renamed/ -P _ST_T_tch_small -S 5 -n 1
 
 
 #More complex working example: this will run only the ST_T_tch and the V+Jets samples and split them into batches of 10 files, taking them from the remote folder on Orso's public:
@@ -35,11 +36,13 @@ fileListDir = join(workdir,'files')
 #define samples paths
 #pathlocal = "/afs/cern.ch/work/w/wajid/NapoliFW/CMSSW_8_0_16/src/Analysis/NAAnaFW/test/crab_projects/crab_st_top/results/ST/" 
 pathlocal = "/afs/cern.ch/work/w/wajid/NapoliFW/CMSSW_8_0_20/src/Analysis/NAAnaFW/bin/ST/"
-filepath='/afs/cern.ch/work/w/wajid/NapoliFW/CMSSW_8_0_20/src/Analysis/NAAnaFW/bin/mc/'
+filepath = '/afs/cern.ch/work/w/wajid/NapoliFW/CMSSW_8_0_20/src/Analysis/NAAnaFW/bin/mc/'
 
 
 usage = ''
 parser = optparse.OptionParser(usage)
+#Output files/directory
+parser.add_option('-o', '--outputpath',        dest='outputpath',  type='string',     default = '.',  help='output for root files')
 
 #Input files:
 parser.add_option('-f', '--filepath',        dest='filepath',  type='string',     default = './files/final/',      help='files with the trees location, default to the afs area where the latest version is always located')
@@ -55,11 +58,11 @@ parser.add_option('',   '--sync',     dest='sync',    type='string',     default
 parser.add_option('-d', '--isData',   dest='isData',  type='string',     default = 'MC',      help='is Data or MC?')
 parser.add_option('-t', '--treesDir',        dest='treesDir',  type='string',  default = "noTrees",        help='trees directory, if blank no tree is generated')
 parser.add_option('--mva',        dest='mva',  type='string',  default = "noMVA",        help='which mva to train')
-
+parser.add_option('--tmpdir',     dest='tmpdir',  type='string',  default = "/tmp/oiorio/",        help='tmp directory for local tmp cp mode')
 #Running mode details:
 parser.add_option('-g', '--gdb',      dest='gdb',     action='store_true', default=False)
 parser.add_option('-n', '--dryrun',   dest='dryrun',  action='store_true', default=False)
-parser.add_option('-m', '--mode',     dest='mode',    default='t3se', choices=['local','t3se'])
+parser.add_option('-m', '--mode',     dest='mode',    default='t3se', choices=['local','t3se','tmpcp'])
 parser.add_option('--t3batch',        dest='t3batch', action='store_true', default=False)
 #Splitting options:
 parser.add_option('-S', '--split',        dest='split',  type=int,     default = 0, help="Splitting each channel by batches of n jobs running simultaneously, where n= opt.splitMultiplicity. If s==0, no splitting is done(default). NOTA BENE! Doesn't work on local files atm.")
@@ -91,6 +94,8 @@ if not exists('test'):
 
 filePath= opt.filepath
 pathlocal = opt.localpath
+
+    
 if opt.split!=0:#Modify the samples and txt list!
     samplesOld=samples
     samples=[]
@@ -129,13 +134,43 @@ for s in samples:
 #    if opt.dry: continue
     #f (s.startswith("JetHT") or s.startswith("SingleMu") or s.startswith("SingleEl") or  s.startswith("MET") or opt.isData): isData="DATA"
     isData=opt.isData
-
+    tmpPath =""
+    if opt.mode == "tmpcp":
+        tmpPath= opt.tmpdir+"/"+s
+        os.system("mkdir "+tmpPath)
+        sT2Path = join(filePath,s+'.txt')
+        print sT2Path 
+        f = open(sT2Path,'r')
+        listing = f.read()
+        fileslist = listing.split()
+        issuccessful=False
+        for f in fileslist[:-1]:
+            localcpcommand="xrdcp "+f+ " "+ tmpPath + " > xrdout.log &"
+ 
+#            localcpcommand="gfal-ls  srm://stormfe1.pi.infn.it//cms/"+(fileslist[-1]).replace("root://cms-xrd-global.cern.ch//","")
+            #localcpcommand="gfal-copy  --force srm://stormfe1.pi.infn.it//cms/"+(f).replace("root://cms-xrd-global.cern.ch//","") + " " + tmpPath + "> gfalout.log &"
+            #        localcpcommand="gfal-ls  srm://stormfe1.pi.infn.it//cms/"+(fileslist[-1]).replace("root://cms-xrd-global.cern.ch//","")
+            print "copying with command ",localcpcommand
+            #            print "final command is ", localcpcommand
+            os.system(localcpcommand)
+        localcpcommand="xrdcp "+fileslist[-1]+ " "+ tmpPath +" > xrdout.log "
+#        localcpcommand="gfal-copy  --force srm://stormfe1.pi.infn.it//cms/"+(fileslist[-1]).replace("root://cms-xrd-global.cern.ch//","") + " " + tmpPath +" > gfalout.log "
+#        localcpcommand="gfal-ls  srm://stormfe1.pi.infn.it//cms/"+(fileslist[-1]).replace("root://cms-xrd-global.cern.ch//","")
+#        localcpcommand="gfal-ls  srm://stormfe1.pi.infn.it//cms/"+(fileslist[-1]).replace("root://cms-xrd-global.cern.ch//","")+ " "+ tmpPath 
+        print "final command is ", localcpcommand
+        os.system(localcpcommand)
+        sPath = join(tmpPath,'/*.root')
+        files = glob.glob(sPath)
+        print 'Info: Sample',s,'Files found',len(files)
+        issuccessufl= (commands.getstatusoutput(localcpcommand)[0]==0)
+        
     if opt.mode == 'local':
         print 'Info: Running in local mode ...'
         sPath = join(pathlocal,'*.root')
         print 'Info: Looking for the *.root files at: ',sPath
-        
-        # Get the complete list of files
+
+
+
         # listing = subprocess.check_output(lLs.split()+[sPath])
         files = glob.glob(sPath)
         print 'Info: Sample',s,'Files found',len(files)
@@ -158,8 +193,13 @@ for s in samples:
     with open(sampleFileList,'w') as sl:
         sl.write('\n'.join(files))
     
-        
-    outDirs = ['res','trees']
+    if opt.outputpath:
+      #opath='/afs/cern.ch/work/w/wajid/public/xWajid'
+      outDirs = [opt.outputpath + '/' + 'res', opt.outputpath + '/' + 'trees']
+    else:
+      outDirs = ['res','trees']
+    
+    #outDirs = ['res','trees']
 
     if (opt.treesDir!="./" and opt.treesDir!='noTrees'): outDirs.append(opt.treesDir)
     for d in outDirs:
@@ -168,9 +208,42 @@ for s in samples:
       
 #    treescheck = (not (commands.getstatusoutput('ls '+ opt.treesDir)[0]==0))
 #    print "treescheck, command is ",("ls "+opt.treesDir)," result ",treescheck
-    cmd = 'SingleTopAnalysis '+ s + ' ' + sampleFileList  + ' ' + opt.channel + ' ' + opt.cat + ' ' + opt.sys + ' ' + opt.sync + ' ' + isData + ' ' + opt.treesDir + ' ' + opt.mva
-    print cmd
-
+    
+        
+    cmd = 'SingleTopAnalysis '+ s + ' ' + sampleFileList  + ' ' + opt.channel + ' ' + opt.cat + ' ' + opt.sys + ' ' + opt.sync + ' ' + isData + ' ' + opt.treesDir + ' ' + opt.mva + ' ' + opt.outputpath
+    channels= opt.channel    
+    if "," in channels:
+        cmd =''
+        for c in channels.split(","):
+            cmd = cmd + 'SingleTopAnalysis '+ s + ' ' + sampleFileList  + ' ' + c + ' ' + opt.cat + ' ' + opt.sys + ' ' + opt.sync + ' ' + isData + ' ' + opt.treesDir + ' ' + opt.mva + ' ' + opt.outputpath + " & \n "
+    print "cmd is: ",cmd
+       
+#    if opt.mode=="tmpcp":
+#        import time
+#        time.sleep(30)
+#        alldone=False
+#        nretries=0
+#        f = open(sT2Path,'r')
+#        listing = f.read()
+#        fileslistsize = len(listing.split())
+#        while not alldone:
+#            nretries = nretries+1
+#            sizesVsFiles = commands.getstatusoutput("ls "+tmpPath+" -s")[1].splitlines()
+#            if nretries >60: 
+#                print "retrying for more than 60 times, the copy probably failed! Aborting..."
+#                exit
+#            if len(sizesVsFiles[1:])!=fileslistsize:
+#                print " n files:",fileslistsize," files copying ", len(sizesVsFiles[1:]), "waiting 10 seconds before retrying"
+#                time.sleep(10)
+#                continue
+#            print " n files:",fileslistsize," files copying ", len(sizesVsFiles[1:]), "waiting 10 seconds before retrying"
+#            fileDone=True
+#            for f in sizesVsFiles[1:]:
+#                print " file ", f.split()[1], " size ", f.split[0]
+#                if not( f.split()[0]>100):
+#                    time.sleep(20)
+#                fileDone=fileDone and ( f.split()[0]>100)
+#            
     if opt.gdb:
         cmd = 'gdb --args '+cmd
     
@@ -178,19 +251,23 @@ for s in samples:
         #usage: qexe.py [-h] [-w WORKDIR] [-q QUEUE] [-n] [-e {qsub,bsub}]
         print 'Info: Running on t3se in batch mode ...'
         sPath = join(pathlocal,'*.root')
+#        que = '-q 2nw'
         que = '-q 8nh'
+#        que = '-q 1nd'
         dry = '-n'
         batch = '-e bsub'
-        jid = '%s_%s_%s_%s' % (s,opt.channel,opt.cat,opt.sys)
+        jid = '%s_%s_%s_%s' % (s,opt.channel.replace(",","AND"),opt.cat,opt.sys)
         #cmd = './run.py -w ' + workdir + ' ' + que + ' ' + dry + ' ' + batch + ' ' + jid + ' '+cmd
-        cmd = './run.py -w ' + workdir + ' ' + que + ' ' + batch + ' ' + jid + ' '+cmd
-     
+        cmd = './run.py -w ' + workdir + ' ' + que + ' ' + batch + ' ' + jid + ' " '+cmd+ ' " '
+        print "now cmd is ", cmd
     print 'Info:',cmd
  
     if opt.dryrun:
         print 'Dry Run (command will not be executed)'
         continue
-    
+    if opt.mode == "tmpcp":
+        print "copy mode: no running will be done!"
+        continue
     print '--------------------'
     subprocess.call(cmd,shell=True)
 

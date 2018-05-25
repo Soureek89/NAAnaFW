@@ -1,0 +1,17 @@
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/80xV2_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/170714_110916/0000/treesTTJets_1.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/80xV2_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/170714_110916/0000/treesTTJets_14.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/80xV2_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/170714_110916/0000/treesTTJets_12.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/80xV2_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/170714_110916/0000/treesTTJets_10.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/80xV2_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/170714_110916/0000/treesTTJets_13.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/80xV2_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/170714_110916/0000/treesTTJets_15.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/80xV2_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/170714_110916/0000/treesTTJets_7.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/80xV2_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/170714_110916/0000/treesTTJets_2.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/80xV2_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/170714_110916/0000/treesTTJets_16.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/80xV2_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/170714_110916/0000/treesTTJets_4.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/80xV2_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/170714_110916/0000/treesTTJets_6.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/80xV2_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/170714_110916/0000/treesTTJets_11.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/80xV2_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/170714_110916/0000/treesTTJets_5.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/80xV2_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/170714_110916/0000/treesTTJets_8.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/80xV2_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/170714_110916/0000/treesTTJets_9.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/80xV2_WWTo1L1Nu2Q_13TeV_amcatnloFXFX_madspin_pythia8/170714_110916/0000/treesTTJets_3.root
+

@@ -1,0 +1,5 @@
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/80xV2_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/170714_110547/0000/treesTTJets_4.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/80xV2_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/170714_110547/0000/treesTTJets_1.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/80xV2_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/170714_110547/0000/treesTTJets_2.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/80xV2_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/170714_110547/0000/treesTTJets_3.root
+

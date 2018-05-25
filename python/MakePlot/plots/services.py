@@ -75,14 +75,19 @@ class Histo(object):
         self._h.SetTitle("");
         #if(color != ROOT.kRed and color != ROOT.kRed+1): self._h.SetLineColor(1)
         #else: 
-        self._h.SetLineColor(color)
-        self._h.SetLineWidth(self._lineWidth)
-        self._h.SetLineStyle(style)
-        self._h.SetFillColor(color)
-        self._h.SetFillStyle(fill)
+        if color==ROOT.kBlack:
+            self._h.SetLineColor(ROOT.kBlack)
+            self._h.SetMarkerStyle(20)
+            self._h.SetMarkerSize(0.9)
+        else:
+            self._h.SetLineColor(ROOT.kBlack)
+            self._h.SetLineWidth(self._lineWidth)
+            self._h.SetLineStyle(style)
+            self._h.SetFillColor(color)
+            self._h.SetFillStyle(fill)
         self._h.GetXaxis().SetTitle(self._title)
         nEvts = (self._h.GetXaxis().GetXmax() - self._h.GetXaxis().GetXmin()) / self._h.GetNbinsX()
-        self._h.GetYaxis().SetTitle("Events/"+ str.format("{0:.2f}", nEvts) );
+        self._h.GetYaxis().SetTitle("Events /"+ str.format("{0:.0f} GeV", nEvts));
 
     def SetStyleUnit(self, color, style = 0, fill = 0):
         self._h.GetXaxis().SetLabelFont(self._labelFont);
@@ -249,12 +254,12 @@ class Stack(object):
     #_xTitleSize = 0.055
     #_yTitleSize = 0.06
 
-    _labelSize = 0.06
+    _labelSize = 0.07
     _xTitleSize = 0.06
     _yTitleSize = 0.07
 
     _xTitleOffset = 0.9
-    _yTitleOffset = 1.25
+    _yTitleOffset = 0.8
     
 
     def __init__(self, name, title):
@@ -283,7 +288,7 @@ class Stack(object):
     def SetStyle(self, options = ""):
         self._hs.Draw(options)
         self._hs.GetHistogram().GetXaxis().SetLabelFont(self._labelFont);
-        self._hs.GetHistogram().GetYaxis().SetMaxDigits(4);
+#        self._hs.GetHistogram().GetYaxis().SetMaxDigits(4);
         self._hs.GetHistogram().GetYaxis().SetLabelFont(self._labelFont);
         self._hs.GetHistogram().GetXaxis().SetTitleFont(self._titleFont);
         self._hs.GetHistogram().GetYaxis().SetTitleFont(self._titleFont);
@@ -300,7 +305,7 @@ class Stack(object):
         self._hs.GetHistogram().GetXaxis().SetTitle(self._title)
         nEvts = (self._hs.GetHistogram().GetXaxis().GetXmax() - self._hs.GetHistogram().GetXaxis().GetXmin()) / self._hs.GetHistogram().GetNbinsX()
         #self._hs.GetHistogram().GetYaxis().SetTitle("Number of events / "+ str.format("{0:.2f}", nEvts) );
-        self._hs.GetHistogram().GetYaxis().SetTitle("Events / "+ str.format("{0:.0f}", nEvts) );
+        self._hs.GetHistogram().GetYaxis().SetTitle("Events/bin"); #+ str.format("{0:.0f}", nEvts)
  #       self._hs.Draw(options)
 
     def SetStyleUnit(self, options = ""):
@@ -408,7 +413,7 @@ class Stack(object):
 
 class Legend(object):
 
-    _coords = (0.5, 0.12, 0.89, 0.90)
+    _coords = (0.46, 0.56, 0.95, 0.88)
     _textSize = 0.045
 
     def __init__(self, coords = None, textSize=None):
@@ -420,7 +425,7 @@ class Legend(object):
         self._leg = ROOT.TLegend(*coords)
 
 #        self._leg = ROOT.TLegend(.51, .58, .92, .86)
-        self._leg.SetNColumns(4)
+        self._leg.SetNColumns(2)
         self._leg.SetFillColor(0)
         self._leg.SetFillStyle(0)
         self._leg.SetTextSize(textSize)

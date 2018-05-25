@@ -1,0 +1,6 @@
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo2L2Nu_13TeV-powheg/80xV2_WWTo2L2Nu_13TeV-powheg/170714_110944/0000/treesTTJets_3.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo2L2Nu_13TeV-powheg/80xV2_WWTo2L2Nu_13TeV-powheg/170714_110944/0000/treesTTJets_2.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo2L2Nu_13TeV-powheg/80xV2_WWTo2L2Nu_13TeV-powheg/170714_110944/0000/treesTTJets_4.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo2L2Nu_13TeV-powheg/80xV2_WWTo2L2Nu_13TeV-powheg/170714_110944/0000/treesTTJets_1.root
+root://cms-xrd-global.cern.ch//store/user/oiorio/SingleTop/2017/July/13July//WWTo2L2Nu_13TeV-powheg/80xV2_WWTo2L2Nu_13TeV-powheg/170714_110944/0000/treesTTJets_5.root
+

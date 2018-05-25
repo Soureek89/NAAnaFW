@@ -13,6 +13,7 @@ void trainTMVA(string inputname, string cfgfile){
   
   
   string bas, option="";
+  TString weightexpr = "";
   while(std::getline(varCfgFile, bas)) {
     if( bas.find("#") != std::string::npos) {
        if(bas.find("#") == 0) continue;
@@ -66,6 +67,9 @@ void trainTMVA(string inputname, string cfgfile){
        if(type == "Test") nTestBackground += theTree->GetEntries();
        continue;
     }
+    if(option == "[weightExpr]" ) {
+      weightexpr = bas.substr(0, bas.find(" "));
+    }
   }
   varCfgFile.close();
   cout << ">> The config file has been read and loaded." << endl;
@@ -78,7 +82,9 @@ void trainTMVA(string inputname, string cfgfile){
   
   //  factory.SetWeightExpression("1.0");  
   factory.SetWeightExpression("w_nominal");  
-  
+  cout << "weight expression is "<<weightexpr<<endl;
+  if(weightexpr!="")factory.SetWeightExpression(weightexpr);  
+
 
   TCut preselection_sig = "";//weightcut;//"nextrajets<0.10"; 
   TCut preselection_bkg = "";//weightcut;//"nextrajets<0.10";
@@ -89,8 +95,20 @@ void trainTMVA(string inputname, string cfgfile){
 
   factory.PrepareTrainingAndTestTree(preselection_sig, preselection_bkg, TString("nTrain_Signal=nTrainSignal:nTrain_Background=nTrainBackground:nTest_Signal=nTestSignal:nTest_Background=nTestBackground:SplitMode=Block:VerboseLevel=Info"));
 
-  factory.BookMethod(TMVA::Types::kBDT, "BDT", "!H:!V:NTrees=800:MinNodeSize=0.05:BoostType=AdaBoost:SeparationType=GiniIndex:PruneMethod=CostComplexity:MaxDepth=3:PruningValFraction=0.3:PruneStrength=-1");
+  factory.BookMethod(TMVA::Types::kBDT, "BDT", "!H:!V:NTrees=800:MinNodeSize=0.05:BoostType=AdaBoost:SeparationType=GiniIndex:PruneMethod=CostComplexity:MaxDepth=3:PruningValFraction=0.3:PruneStrength=-1:UseRandomisedTrees=True");
 
+  //Normal settings
+  //factory.BookMethod(TMVA::Types::kBDT, "BDT", "!H:!V:NTrees=800:MinNodeSize=0.05:BoostType=AdaBoost:SeparationType=GiniIndex:PruneMethod=CostComplexity:MaxDepth=3:PruningValFraction=0.3:PruneStrength=-1");
+  
+  //Adding UseRandomisedTrees=True
+  //factory.BookMethod(TMVA::Types::kBDT, "BDT", "!H:!V:NTrees=800:MinNodeSize=0.05:BoostType=AdaBoost:SeparationType=GiniIndex:PruneMethod=CostComplexity:MaxDepth=3:PruningValFraction=0.3:PruneStrength=-1:UseRandomisedTrees=True");
+  
+  //Adding AdaBoostBeta=0.5
+  //factory.BookMethod(TMVA::Types::kBDT, "BDT", "!H:!V:NTrees=800:MinNodeSize=0.05:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:PruneMethod=CostComplexity:MaxDepth=3:PruningValFraction=0.3:PruneStrength=-1:UseRandomisedTrees=True");
+  
+  //Adding UseNvars=5 default value 2
+  //factory.BookMethod(TMVA::Types::kBDT, "BDT", "!H:!V:NTrees=800:MinNodeSize=0.05:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:PruneMethod=CostComplexity:MaxDepth=3:PruningValFraction=0.3:PruneStrength=-1:UseRandomisedTrees=True:UseNvars=5");
+ 
   factory.TrainAllMethods();
   factory.TestAllMethods();
   factory.EvaluateAllMethods();

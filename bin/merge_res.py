@@ -89,7 +89,7 @@ def domerge(samples, channels, toRetry={} ):
 
         for c in channels:
             systs=[]
-            cmdlsbase = "ls "+path+s+"*_part*"+c+"*.root"
+            cmdlsbase = "ls "+path+s+"_part*"+c+"*.root"
             
             linesall = commands.getstatusoutput(cmdlsbase)[1].splitlines()
             for l in linesall:
@@ -105,9 +105,9 @@ def domerge(samples, channels, toRetry={} ):
                         continue
            
                 print "check syst",sys
-                cmdls = "ls "+path+s+"*_part*"+c+"_"+sys+".root"
+                cmdls = "ls "+path+s+"_part*"+c+"_"+sys+".root"
                 if "noSys" in sys:
-                    cmdls = "ls "+path+s+"*_part*"+c+".root"
+                    cmdls = "ls "+path+s+"_part*"+c+".root"
 
                 if (commands.getstatusoutput(cmdls)[0]==0):
                     linessys = commands.getstatusoutput(cmdls)[1].splitlines()
@@ -120,9 +120,9 @@ def domerge(samples, channels, toRetry={} ):
                     print halves
                     mergeoutput=False
                     if(len(halves)==2 and opt.domerge):
-                        cmdmerge="hadd -f "+halves[0].replace(path,pathout)+halves[1]+" "+path+s+"*_part*"+c+"_"+sys+".root"
+                        cmdmerge="hadd -f "+halves[0].replace(path,pathout)+halves[1]+" "+path+s+"_part*"+c+"_"+sys+".root"
                         if "noSys" in sys:
-                            cmdmerge="hadd -f "+halves[0].replace(path,pathout)+halves[1]+" "+path+s+"*_part*"+c+".root"
+                            cmdmerge="hadd -f "+halves[0].replace(path,pathout)+halves[1]+" "+path+s+"_part*"+c+".root"
                         print "merging with the command: ",cmdmerge
                         mergeoutput=True
                         statusoutput = (commands.getstatusoutput(cmdmerge))
@@ -138,16 +138,16 @@ def domerge(samples, channels, toRetry={} ):
                                 os.system("rm "+ toremove)
                                 systToRetry.append(sys)
                     if (mergeoutput and opt.doremove and not toretry):
-                        cmdrm = "rm "+path+s+"*_part*"+c+"_"+sys+".root"
+                        cmdrm = "rm "+path+s+"_part*"+c+"_"+sys+".root"
                         if "noSys" in sys:
-                            cmdrm = "rm "+path+s+"*_part*"+c+".root"
+                            cmdrm = "rm "+path+s+"_part*"+c+".root"
                         print " now removing with the command: ", cmdrm
                         os.system(cmdrm)
 	
                     if opt.doforceremove :
-                        cmdrm = "rm "+path+s+"*_part*"+c+"_"+sys+".root"
+                        cmdrm = "rm "+path+s+"_part*"+c+"_"+sys+".root"
                         if "noSys" in sys:
-                            cmdrm = "rm "+path+s+"*_part*"+c+".root"
+                            cmdrm = "rm "+path+s+"_part*"+c+".root"
                         print " forcing removal with with the command: ", cmdrm
                         os.system(cmdrm)
 	                    

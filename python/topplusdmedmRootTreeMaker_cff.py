@@ -38,8 +38,11 @@ systsToSave = ["noSyst"]
 metFilters = ["Flag_CSCTightHaloFilter","Flag_goodVertices", "Flag_eeBadScFilter"]
 
 catMu = ["Tight","TightAntiIso","Loose"]
-catEl = ["Tight","TightAntiIso","Veto"]
+catEl = ["Tight","TightAntiIso","Veto","Antiveto"]
 catJet = ["Tight"]
+#catMet = ["CorrT1"]
+catMet = []
+
 #                    muonsTight_Pt -> Iso <0.15 
 #ttDM__noSyst->Draw("muonsTightIso04_LE_0p06_Pt") -> Iso < 0.06
 
@@ -49,7 +52,7 @@ scanJet = ["CorrPt_20"]
 
 sysMu = [""]
 sysEl = [""]
-sysJet = ["JESUp","JESDown"]
+sysJet = ["JESUp","JESDown","JERUp","JERDown"]
 
 #scanJet = ["CorrPt_30"]
 #scanJet = ["Pt_30","Pt_40"]
@@ -109,29 +112,6 @@ DMTreesDumper = cms.EDAnalyzer(
     eventLabel = eventlabel,
     JECVersion = jecVersion,
     physicsObjects = cms.VPSet(
-        cms.PSet(
-            label = metlabel,
-            prefix = cms.string("metFull"),
-            maxInstances =  cms.untracked.int32(1),
-            saveBaseVariables = cms.untracked.bool(True),
-            categories = cms.vstring(),
-            scanCuts = cms.vstring(),
-            systCats = cms.vstring(),
-            variablesD = cms.VInputTag(),
-            variablesF = cms.VInputTag(
-                cms.InputTag("metFull","metFulluncorPt"),
-                cms.InputTag("metFull","metFulluncorPhi"),
-                cms.InputTag("metFull","metFullPt"),
-                cms.InputTag("metFull","metFullPhi"),
-                cms.InputTag("metFull","metFullPx"),
-                cms.InputTag("metFull","metFullPy"),
-                ),
-            variablesI = cms.VInputTag(),
-            singleD = cms.VInputTag(),
-            singleI = cms.VInputTag(),
-            singleF = cms.VInputTag(),
-            toSave = cms.vstring(),
-            )
         ),
     
     doPreselection = cms.untracked.bool(doPreselectionCuts), 
@@ -167,6 +147,9 @@ DMTreesDumper = cms.EDAnalyzer(
     HBHEFilter = cms.InputTag("HBHENoiseFilterResultProducer","HBHENoiseFilterResultRun2Loose"),
     HBHEIsoFilter = cms.InputTag("HBHENoiseFilterResultProducer","HBHEIsoNoiseFilterResult"),
     #vertex
+    jetKeysAK4CHS = cms.InputTag("jetKeysAK4CHS", ""),
+    muonKeys = cms.InputTag("muonKeys", ""),
+
     vertexZ =  cms.InputTag("vertexInfo","z"),
     vertexChi2 =  cms.InputTag("vertexInfo","chi"),
     vertexNdof =  cms.InputTag("vertexInfo","ndof"),
@@ -351,6 +334,7 @@ DMTreesDumper.physicsObjects.append(
             cms.InputTag("electrons","elhasMatchedConVeto"),
             cms.InputTag("electrons","elvidVeto"),
             cms.InputTag("electrons","elvidTight"),
+            cms.InputTag("electrons","elvidTightnoiso"),
             cms.InputTag("electrons","elvidMedium"),
             cms.InputTag("electrons","elDz"),
             cms.InputTag("electrons","elDxy"),
@@ -364,7 +348,7 @@ DMTreesDumper.physicsObjects.append(
         categories = cms.vstring(catEl),
         systCats = cms.vstring(sysEl),
 #        categories = cms.vstring("Tight","Veto"),
-        toSave = cms.vstring("elE","elPt","elEta","elPhi","elIso03","elisTight","elCharge","elisMedium","elisLoose","elisVeto","elscEta","allExtra"),
+        toSave = cms.vstring("elE","elPt","elEta","elPhi","elIso03","elisTight","elvidTightnoiso","elCharge","elisMedium","elisLoose","elisVeto","elSCEta","allExtra","elDz","elDxy"),
         )
     ) 
 
@@ -590,7 +574,7 @@ if(doAK8):
             )
         )
 
-
+    
     DMTreesDumper.physicsObjects.append( 
         cms.PSet(
             label = subjetak8label,
@@ -617,6 +601,32 @@ if(doAK8):
         )
     
 
+DMTreesDumper.physicsObjects.append(
+        cms.PSet(
+        label = metlabel,
+            prefix = cms.string("metFull"),
+            maxInstances =  cms.untracked.int32(1),
+            saveBaseVariables = cms.untracked.bool(True),
+            categories = cms.vstring(),
+            scanCuts = cms.vstring(),
+#            systCats = cms.vstring(),
+            systCats = cms.vstring(),
+            variablesD = cms.VInputTag(),
+            variablesF = cms.VInputTag(
+                cms.InputTag("metFull","metFulluncorPt"),
+                cms.InputTag("metFull","metFulluncorPhi"),
+                cms.InputTag("metFull","metFullPt"),
+                cms.InputTag("metFull","metFullPhi"),
+                cms.InputTag("metFull","metFullPx"),
+                cms.InputTag("metFull","metFullPy"),
+                ),
+            variablesI = cms.VInputTag(),
+            singleD = cms.VInputTag(),
+            singleI = cms.VInputTag(),
+            singleF = cms.VInputTag(),
+            toSave = cms.vstring(),
+            )
+)
 #if(not isData):
 #DMTreesDumper.physicsObjects.append(  
 #    cms.PSet(

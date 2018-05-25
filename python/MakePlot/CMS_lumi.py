@@ -1,4 +1,5 @@
 import ROOT as rt
+#from ROOT 
 
 # CMS_lumi
 #   Initiated by: Gautier Hamel de Monchenault (Saclay)
@@ -34,7 +35,7 @@ lumi_sqrtS = ""
 
 drawLogo      = False
 
-def CMS_lumi(pad,  iPeriod,  iPosX ):
+def CMS_lumi(pad,  lumi_sqrtS,  iPosX ):
     outOfFrame    = False
     if(iPosX/10==0 ): outOfFrame = True
 
@@ -58,6 +59,8 @@ def CMS_lumi(pad,  iPeriod,  iPosX ):
     pad.cd()
 
     lumiText = ""
+    lumiText += lumi_sqrtS
+    '''
     if( iPeriod==1 ):
         lumiText += lumi_7TeV
         lumiText += " (7 TeV)"
@@ -89,7 +92,7 @@ def CMS_lumi(pad,  iPeriod,  iPosX ):
         lumiText += "8 TeV"
     elif ( iPeriod==0 ):
         lumiText += lumi_sqrtS
-            
+    '''        
     print lumiText
 
     latex = rt.TLatex()
@@ -122,6 +125,8 @@ def CMS_lumi(pad,  iPeriod,  iPosX ):
         posX_ =  1-r - relPosX*(1-l-r)
 
     posY_ = 1-t - relPosY*(1-t-b)
+
+    print lumiText," 2 "
 
     if( not outOfFrame ):
         if( drawLogo ):
@@ -158,4 +163,6 @@ def CMS_lumi(pad,  iPeriod,  iPosX ):
         latex.SetTextAlign(align_)
         latex.DrawLatex(posX_, posY_, extraText)      
 
+    print lumiText," 3 "
     pad.Update()
+    print lumiText," 4 "

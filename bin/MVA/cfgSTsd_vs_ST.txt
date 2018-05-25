@@ -1,32 +1,38 @@
 [variables]
 etajprime
 mlb
+mljprime
+mindeltaphi20
 nextrajets
 topMass
 topMassExtra
 topPt
 topY
-#leadingextrajetcsv
+leadingextrajetcsv
 leadingextrajetpt
+#bdt_st_vs_tt
+#bdt_st_vs_vj
 [signalFiles]
 #
 # Syntax:
 # FileName TreeName [Training/Test] [weight]
 #
 # train
-../treesmerge/trees_ST_T_tch_sd_muon.root events_2j1t_mtwcut Training 1.
-# test
-../treesmerge/trees_ST_T_tch_sd_muon.root events_2j1t_mtwcut Test 1.
+#../treesmerge/trees_ST_T_tch_sd_muon.root events_2j1t_mtwcut Training 1.
+#../trees/trees_ST_T_tch_sd_part0_muon.root events_2j1t_mtwcut Training 1.
+../treeslocallaunch/trees_ST_T_tch_sd_muon.root events_2j1t_mtwcut Training 1.
+../treeslocallaunch/trees_ST_T_tch_sd_muon.root events_2j1t_mtwcut Test 1.
 [bgFiles]
 #
 # Syntax:
 # FileName TreeName [Training/Test] [weight]
 #
 # train 
-../treesmerge/trees_ST_T_tch_muon.root events_2j1t_mtwcut Training 1.
-# test
-../treesmerge/trees_ST_T_tch_muon.root events_2j1t_mtwcut Test 1.
-
-
+#../treesmerge/trees_ST_T_tch_muon.root events_2j1t_mtwcut Training 1.
+../treeslocallaunch/trees_ST_T_tch_muon.root events_2j1t_mtwcut Training 1.
+../treeslocallaunch/trees_ST_T_tch_muon.root events_2j1t_mtwcut Test 1.
+[weightExpr]
+((((((leadingextrajetcsvweight_sd>0.0)*(leadingextrajetcsvweight_sd))+((leadingextrajetcsvweight_sd==0.0)))&&nextrajets>0)+(nextrajets==0))*w_nominal*w)
+#((((leadingextrajetcsvweight_sd>0.0)*(leadingextrajetcsvweight_sd))/0.167+(leadingextrajetcsvweight_sd==0.0))&&nextrajets>0)+(nextrajets==0)*w_nominal)
 
 

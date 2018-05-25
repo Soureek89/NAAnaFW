@@ -4,6 +4,7 @@ import commands, os
 ###
 ### cmsRun topplusdmanaEDMntuples_cfg.py maxEvts=N sample="mySample/sample.root" version="1"7 outputLabel="myoutput"
 ### cmsRun topplusdmTrees_cfg.py maxEvts=-1 sample="file:/afs/cern.ch/work/w/wajid/NapoliFW/CMSSW_8_0_16/src/Analysis/B2GAnaFW/test/B2GEDMNtuple.root" outputLabel='ntuple.root'
+### nohup cmsRun topplusdmTrees_skim_cfg.py maxEvts=-1 sample="file:/afs/cern.ch/work/w/wajid/public/xWajid/synch/mc_tch_jecv4/B2GSynchMC.root" outputLabel='signal3/ntuple.root' doSynch=True >& log3.txt &
 ### Default values for the options are set:
 ### maxEvts     = -1
 ### sample      = 'file:/scratch/decosa/ttDM/testSample/tlbsm_53x_v3_mc_10_1_qPV.root'
@@ -256,26 +257,38 @@ if not options.isData:
 
 
 if not options.isData:
-      process.DMTreesDumper.JECVersion=cms.string("Spring16_23Sep2016V2")
+      process.DMTreesDumper.JECVersion=cms.string("Summer16_23Sep2016V4")
+#      process.DMTreesDumper.JECVersion=cms.string("Spring16_23Sep2016V2")
 
 if options.isData:
-    process.DMTreesDumper.JECVersion=cms.string("Spring16_23Sep2016BCDV2")
-    if options.channel == "DATA2016EF": process.DMTreesDumper.JECVersion=cms.string("Spring16_23Sep2016EFV2")
-    if options.channel == "DATA2016G": process.DMTreesDumper.JECVersion=cms.string("Spring16_23Sep2016GV2")
-    if options.channel == "DATA2016H": process.DMTreesDumper.JECVersion=cms.string("Spring16_23Sep2016HV2")
+    process.DMTreesDumper.JECVersion=cms.string("Summer16_23Sep2016BCDV4")
+    if options.channel == "DATA2016EF": process.DMTreesDumper.JECVersion=cms.string("Summer16_23Sep2016EFV4")
+    if options.channel == "DATA2016G": process.DMTreesDumper.JECVersion=cms.string("Summer16_23Sep2016GV4")
+    if options.channel == "DATA2016H": process.DMTreesDumper.JECVersion=cms.string("Summer16_23Sep2016HV4")
 
 if options.channel == "ttbar" or options.channel == "ttbar_sd":
     process.DMTreesDumper.getPartonTop  = cms.untracked.bool(True)
     process.DMTreesDumper.channelInfo.doTopReweighting = cms.untracked.bool(True)
 
-if options.channel == "ttbar_sd" or options.channel== "tch_sd":
+if options.channel == "ttbar_sd" or options.channel== "tch_sd_reshape":
     process.DMTreesDumper.channelInfo.getPartonTop  = cms.untracked.bool(True)
     process.DMTreesDumper.channelInfo.doTopDecayReshaping = cms.untracked.bool(True)
+    process.DMTreesDumper.channelInfo.resBFile = cms.untracked.string("testErrors.root")
+
+if  options.channel== "tch_psd_reshape":
+    process.DMTreesDumper.channelInfo.getPartonTop  = cms.untracked.bool(True)
+    process.DMTreesDumper.channelInfo.doTopDecayReshaping = cms.untracked.bool(True)
+    process.DMTreesDumper.channelInfo.isProd = cms.untracked.bool(True)
     
+if options.channel == "tch_psd":
+    process.DMTreesDumper.channelInfo.getPartonTop  = cms.untracked.bool(True)
+    process.DMTreesDumper.channelInfo.getCKMType = cms.untracked.bool(True)    
+
 if options.channel == "wzjets":
     print "channel is " + options.channel 
     process.DMTreesDumper.channelInfo.getPartonW  = cms.untracked.bool(True)
     process.DMTreesDumper.channelInfo.getParticleWZ  = cms.untracked.bool(True)
+
 if options.channel == "qcd":
     process.DMTreesDumper.channelInfo.useLHE = cms.untracked.bool(False)
     process.DMTreesDumper.channelInfo.useLHEWeights = cms.untracked.bool(False)

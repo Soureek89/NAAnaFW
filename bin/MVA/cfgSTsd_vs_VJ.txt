@@ -1,12 +1,14 @@
 [variables]
 etajprime
 mlb
+mljprime
+mindeltaphi20
 nextrajets
 topMass
 topMassExtra
 topPt
 topY
-#leadingextrajetcsv
+leadingextrajetcsv
 leadingextrajetpt
 [signalFiles]
 #
@@ -14,9 +16,8 @@ leadingextrajetpt
 # FileName TreeName [Training/Test] [weight]
 #
 # train
-../treesmerge/trees_ST_T_tch_sd_muon.root events_2j1t_mtwcut Training 1.
-# test
-../treesmerge/trees_ST_T_tch_sd_muon.root events_2j1t_mtwcut Test 1.
+../treeslocallaunch/trees_ST_T_tch_sd_muon.root events_2j1t_mtwcut Training 1.
+../treeslocallaunch/trees_ST_T_tch_sd_muon.root events_2j1t_mtwcut Test 1.
 [bgFiles]
 #
 # Syntax:
@@ -28,6 +29,7 @@ leadingextrajetpt
 # test
 ../treesmerge/trees_WToLNu1J_muon.root events_2j1t_mtwcut Test 0.8
 ../treesmerge/trees_WToLNu2J_muon.root events_2j1t_mtwcut Test 0.2
-
+[weightExpr]
+((((((leadingextrajetcsvweight_sd>0.0)*(leadingextrajetcsvweight_sd))+((leadingextrajetcsvweight_sd==0.0)))&&nextrajets>0)+(nextrajets==0))*w_nominal*w)
 
 
